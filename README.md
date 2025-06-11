@@ -1,8 +1,8 @@
-Advanced Inventory System
+# Welcome to the Advanced Inventory System
 
-This project is a practice program attempting to model an Inventory System of a video game using Unreal Engine 5.
+## This project is a practice program attempting to model an Inventory System of a video game using **Unreal Engine 5.**
 
-The Inventory Systems main goal is to have the following features:
+The Inventory Systems main goal is to serve as both a _practice and training exercise_ for myself and as a guide for other that wish to implement something similar into their games/projects. This Inventory includes the following features:
 * Stackable and Usable Items
 * Chests and Contatiners with their own inventory.
 * Transfering of items between slots and container inventroies
@@ -10,3 +10,5 @@ The Inventory Systems main goal is to have the following features:
 * A hot bar in which you can drag items to Bind them to the hotbar slot
 * An attempt of a save/loading system in which your inventory is saved at the end of a Game and loads the inventory at the beginning of the game
 * An attempt of a save/load system where it saves the position of dropped items.
+
+This document is meant to be a documentation of all the features as well as an explanation using Pseudo code for all the added elements of the project.
