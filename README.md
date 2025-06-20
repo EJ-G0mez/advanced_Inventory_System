@@ -12,3 +12,13 @@ The Inventory Systems main goal is to serve as both a _practice and training exe
 * An attempt of a save/load system where it saves the position of dropped items.
 
 This document is meant to be a documentation of all the features as well as an explanation using Pseudo code for all the added elements of the project.
+
+# Syntaxis and Diagram
+
+## How is this document organized and how should you read it?
+
+This section is to give an understanding of how the document will be formated and organized as well as explaining the diagrams that will be placed around this document.
+
+### Diagrams
+
+There will be general UML Diagrams summarizing and showing the logic of every component:
