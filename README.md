@@ -75,6 +75,19 @@ Example:
 <details>
   
   <summary>Inventory System</summary>
+
+  # Inventory_System
+
+  ## The main function of the system
+
+  This function is the core of this project, it is the system in which items are added, removed, transfered, used etc
+
+  ![imagen](https://github.com/user-attachments/assets/32e7b6d2-2cfd-4077-83d2-09ac555ea428) [^3]
+  
+  [^3]: Inventory System Class Diagram
+
+  <summary>Event Graph</summary>
+  <summary>AddToInventory</summary>
   
 </details>
 
