@@ -80,13 +80,94 @@ Example:
 
   ## The main function of the system
 
-  This function is the core of this project, it is the system in which items are added, removed, transfered, used etc
+  This function is the core of this project, it is the system in which items are added, removed, transfered, used, etc.
 
   ![imagen](https://github.com/user-attachments/assets/32e7b6d2-2cfd-4077-83d2-09ac555ea428) [^3]
   
   [^3]: Inventory System Class Diagram
 
+  ### Project Settings
+
+  For this structure you will need to add an input into your Project settings to Interact with items, in this case we will use the "i" key to give the ability to interact with pickable items
+  ![imagen](https://github.com/user-attachments/assets/b75ad283-0a00-4999-af1e-020f104a5118) [^4]
+
+  [^4]: Image showing the project setting where in Inputs, we add the Interact Input that is set to the "i" key.
+
+  
+
   <summary>Event Graph</summary>
+
+  ### Event Graph
+
+  This section show every single event in the Inventory System blueprint class.
+
+  <ins>Event Begin Play</ins>
+
+  The Begin Play event starts at the beginning of the project. It is able to load any previous saved inventories, generate the inventory size, add a display message to the viewport when an item is interactable, and auto saves the inventory. 
+
+  ![imagen](https://github.com/user-attachments/assets/883fade5-97d6-4d10-bf7f-b4d5e6b991de)[^5]
+
+  [^5]: Begin Play Event in Unreal Engine 5
+
+  ```
+  #import F_Slot_Struct
+  #import W_Display_Message
+
+  public class Inventory System {
+
+    private int inventorySize = 16 
+    private F_Slot_Struct[] content;
+    private float interactionTrace = 300.0;
+    private Actor lookAtActor;
+    private W_Display_Message displayMessage;
+
+    private eventDispatch On_Inventory_Update; // Event Dispatcher, allows multiple events to happens at once
+
+    // starts at the beginning of the project
+    public event Event_Begin_Play(){
+      loadInventory(self);
+      content.resize(inventorySize); //sets the contents array size to 16
+      displayMessage = createWidget(classtype.W_Display_Message);
+      addToViewport(displayMessage);
+      bindEventTo(On_Inventory_Update);
+    }
+  }
+  ```
+
+  <ins>Event Tick</ins>
+
+  This Event updates every frame and checks the interaction trace to see if there is an interactable item in front of the player.
+
+  ![imagen](https://github.com/user-attachments/assets/82d3271a-62f8-43c7-8dd1-2f07f0346b82) [^6]
+
+  [^6]: Tick Event in Unreal Engine 5
+
+  
+  ```
+   public event Tick(){
+    interactionTrace(self); //Check if an interactive item is currently in the players interactive distance
+   }
+  ```
+
+  <ins>Event InputAction Interact</ins>
+
+  This Event triggers every time the player interacts with an item with the Inpu "I".
+
+  ![imagen](https://github.com/user-attachments/assets/06a68e27-e3be-416e-9f26-68112ac35407) [^7]
+
+  [^7]: InputAction Interact Event in Unreal Engine 5
+
+  ```
+   public event InputAction_Interact(){ 
+    switch(input Interact){ //checks if the input is pressed or released
+        case "pressed":
+          if(lookAtActor.isValid){
+            Server_Interact(self, lookAtActor)
+          }
+      }
+   }
+  ```
+  
   <summary>AddToInventory</summary>
   
 </details>
