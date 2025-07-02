@@ -93,7 +93,20 @@ Example:
 
   [^4]: Image showing the project setting where in Inputs, we add the Interact Input that is set to the "i" key.
 
-  
+  ```
+  #import F_Slot_Struct
+  #import W_Display_Message
+  #import SaveData-Level;
+  #import Loot_Bag
+
+  public class Inventory System {
+    private int inventorySize = 16 
+    private F_Slot_Struct[] content;
+    private float interactionTrace = 300.0;
+    private Actor lookAtActor;
+    private W_Display_Message displayMessage;
+  }
+  ```
 
   <summary>Event Graph</summary>
 
@@ -110,9 +123,6 @@ Example:
   [^5]: Begin Play Event in Unreal Engine 5
 
   ```
-  #import F_Slot_Struct
-  #import W_Display_Message
-
   public class Inventory System {
 
     private int inventorySize = 16 
@@ -129,7 +139,7 @@ Example:
       content.resize(inventorySize); //sets the contents array size to 16
       displayMessage = createWidget(classtype.W_Display_Message);
       addToViewport(displayMessage);
-      bindEventTo(On_Inventory_Update);
+      bindEventTo(On_Inventory_Update, AutoSave_Inventory);
     }
   }
   ```
@@ -182,7 +192,7 @@ Example:
 
  ```
   public event Server_Interact(actor){
-    owner = (BP_ThirdPersonCharacter) self.getOwner; //We get the owner of the player and cast the value as BP_ThirdPersonCharacter type Objecct
+    BP_ThirdPersonCharacter owner = (BP_ThirdPersonCharacter) self.getOwner; //We get the owner of the player and cast the value as BP_ThirdPersonCharacter type Objecct
     if(target.getComponentByClass(Item_Data_Component).isValid){
       Interact_With(target, owner); //This will go to the Interact with Event algonside with the target object and the owner  
     } else {
@@ -273,8 +283,98 @@ This Event triggers when the player removes an item from their inventory
     removeFromInventory(index, removeWholeStask, isConsumed);
   }
 ```
+
+<ins>Event Server_Drop_Item</ins>
+
+This Event triggers when the player drops an item, for both server and client side, this also saves where these dropped items are placed so they are loaded in the next load of the game
+
+![imagen](https://github.com/user-attachments/assets/a42db1fd-c758-43cd-b7d4-b5a4ed8578b4) [^17]
+
+[^17]: Server_Drop_Items Details in Unreal Engine 5
+
+![imagen](https://github.com/user-attachments/assets/21da8828-176c-44e2-be95-6b1f3b8bfa1b) [^18]
+
+[^18]: Server_Drop_Item Event in Unreal Engine 5
+
+```
+  public event Server_Drop_Item(name itemID, int quantity){
+    if(quantity > 1){
+      addToInventory(spawnActor("Class=" classType.Loot_Bag,"SpawnTransformLocation=" getDropLocation()).Inventory_System, itemID, quantity); // This will generate a loot bag with the amount of items that were dropped
+    } else {
+      actor droppedActor = spawnActor("Class=" getItemData.itemClass, "SpawnTransformLocation=" getDropLocation()); //it will create a new actor with the item characteristics and position where it was last placed
+      delay(.2); // This delay is added to allow the game to save apporpirately with entering a nullPointerException
+      Save_Data_Level saveData = ((BPThirdPersonGameMode) getGameMode()).Save_Data_Level; //We have the save data of Game
+      add(saveData.actorAdded, (soft reference) getItemData.itemClass, getActorTransform(droppedActor)); //we add the dropped items to the save data
+      saveGameToSlot(saveData, ((BPThirdPersonGameMode) getGameMode()).levelDataSlot); //we save the game in a save file
+      DEBUGPrintContent();
+    }
+  }
+```
+
+<ins>Event Server_Consume_Item</ins>
+
+This Event triggers when the player consumes an item and it gives them an effect on server and client side
+
+![imagen](https://github.com/user-attachments/assets/a42db1fd-c758-43cd-b7d4-b5a4ed8578b4) [^19]
+
+[^19]: Server_Consume_Item Details in Unreal Engine 5
+
+![imagen](https://github.com/user-attachments/assets/496cf6bf-bbc8-49c3-9ed7-bab2e3eff8df) [^20]
+
+[^20]: ServerConsume_Item Event in Unreal Engine 5
+
+```
+  public event Server_Drop_Item(name itemID){
+    spawnActor("Class=" getItemData(itemID).itemEffect, "SpawnTransfromLocation"= getDropLocation());
+  }
+```
+
+<ins>Event AutoSave_Inventory</ins>
+
+This Event triggers everytime the player loads the game, it saves to teh current save file
+
+![imagen](https://github.com/user-attachments/assets/4b9750c2-9abe-4894-a112-52e3c8649232) [^21]
+
+[^21]: AutoSave_Inventory Event in Unreal Engine 5
+
+```
+  public event AutoSave_Inventory(){
+    saveInventory();
+  }
+```
   
 <summary>AddToInventory</summary>
+
+This is a function that allows the player to add items to their inventory.
+
+![imagen](https://github.com/user-attachments/assets/9eb9240e-4f3f-4d46-862a-92913472c7c8) [^22]
+
+[^22]: addtoInventory function in Unreal Engine 5
+
+```
+public addToInventory(name itemID, int quantity){
+  boolean localHasFailed;
+  int localQuantityRemaining = quantity;
+  while(localQuantityReaming > 0 AND !localHasFailed){
+    if(findSlot(itemID).foundSlot){
+      addToStack(findSlot(itemID).index, 1);
+      localQuantityRemaining--;
+    } else {
+      if(anyEmptySlotsAvailable().hasEmptySlot){
+        if(createNewStack(itemID, 1).success){
+          localQuantityRemaining--;
+        } else {
+          localHasFailed = true;
+        }
+      }else {
+        localHasFailed = true;
+      }
+    }
+  }
+  callOnInventoryUpdate();
+  return success = !localHasFailed, quantityReaming = localQuantityReaming;
+}
+```
   
 </details>
 
