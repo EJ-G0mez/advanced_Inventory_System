@@ -96,8 +96,9 @@ Example:
   ```
   #import F_Slot_Struct
   #import W_Display_Message
-  #import SaveData-Level;
+  #import SaveData-Level
   #import Loot_Bag
+  #import Item_Data
 
   public class Inventory System {
     private int inventorySize = 16 
@@ -105,6 +106,8 @@ Example:
     private float interactionTrace = 300.0;
     private Actor lookAtActor;
     private W_Display_Message displayMessage;
+    ...
+
   }
   ```
 
@@ -299,9 +302,9 @@ This Event triggers when the player drops an item, for both server and client si
 ```
   public event Server_Drop_Item(name itemID, int quantity){
     if(quantity > 1){
-      addToInventory(spawnActor("Class=" classType.Loot_Bag,"SpawnTransformLocation=" getDropLocation()).Inventory_System, itemID, quantity); // This will generate a loot bag with the amount of items that were dropped
+      addToInventory(spawnActor(/*Class=*/ classType.Loot_Bag,/*SpawnTransformLocation=*/ getDropLocation()).Inventory_System, itemID, quantity); // This will generate a loot bag with the amount of items that were dropped
     } else {
-      actor droppedActor = spawnActor("Class=" getItemData.itemClass, "SpawnTransformLocation=" getDropLocation()); //it will create a new actor with the item characteristics and position where it was last placed
+      actor droppedActor = spawnActor(/*Class=*/ getItemData.itemClass, /*SpawnTransformLocation=*/ getDropLocation()); //it will create a new actor with the item characteristics and position where it was last placed
       delay(.2); // This delay is added to allow the game to save apporpirately with entering a nullPointerException
       Save_Data_Level saveData = ((BPThirdPersonGameMode) getGameMode()).Save_Data_Level; //We have the save data of Game
       add(saveData.actorAdded, (soft reference) getItemData.itemClass, getActorTransform(droppedActor)); //we add the dropped items to the save data
@@ -352,7 +355,7 @@ This is a function that allows the player to add items to their inventory.
 [^22]: addtoInventory function in Unreal Engine 5
 
 ```
-public addToInventory(name itemID, int quantity){
+public AddToInventory(name itemID, int quantity){
   boolean localHasFailed;
   int localQuantityRemaining = quantity;
   while(localQuantityReaming > 0 AND !localHasFailed){
@@ -372,10 +375,110 @@ public addToInventory(name itemID, int quantity){
     }
   }
   callOnInventoryUpdate();
-  return success = !localHasFailed, quantityReaming = localQuantityReaming;
+  return boolean success = !localHasFailed, int quantityReaming = localQuantityReaming;
 }
 ```
-  
+
+<summary>RemoveFromInventory</summary>
+
+This is a function that allows the player to remove items froms their inventory.
+
+![imagen](https://github.com/user-attachments/assets/56e0d81b-a76b-4a77-b256-c75e86873c83) [^23]
+
+[^23]: removeFromInventory function in Unreal Engine 5
+
+```
+public RemoveFromInventory(int index, boolean removeFromWholeStack, isConsumed){
+  int localQuantity = content.itemName;
+  name localItem = content. quantity;
+  sequence {
+    then 0:
+      if(removeFromWholeStack OR localQuantity == 1){
+        setArrayElem(content, index);
+        if(!isConsumed){
+          serverDropItem(localItem, localQuantity);
+        }
+      } else {
+        setMembers(content[index],content[index].quantity-1);
+        if(!isConsumed){
+          serverDropItem(localItem, 1);
+        }
+      }
+    then 1:
+      MCUpdate();
+  }
+}
+```
+
+<summary>InteractionTrace</summary>
+
+This is a function that detects when a player is the proximity of an interactable item, this is done so when the player is lookingat an item, the code will detect the item.
+
+![imagen](https://github.com/user-attachments/assets/d18a760a-7cc8-4286-99a2-feb4972668f6) [^24]
+
+[^24]: interactionTrace function in Unreal Engine 5
+
+```
+public InteractionTrace(){
+  SphereTrace  sphereTrace = sphereTraceByChannel(/*start=*/(getActorLocation(getPlayerCharacter))-Vector3(0.0, 0.0, 65.0),
+                                    /*end=*/ ((getActorLocation(getPlayerCharacter()))-Vector3(0.0, 0.0, 65.0) + (getActorForwardVector(getPlayerCharacter()) * interactionTrace)),
+                                    /*radius=*/ 25.0,
+                                    /*traceChannel=*/ "Interactive",
+                                    /*traceComplex=*/ false,
+                                    /*actorsToIgnore=*/makeArray(getOwner()),
+                                    /*drawDebugType=*/ null,
+                                    /*ignoreSelf=*/ true);
+  if(sphereTrace.returnValue){
+    if(sphereTrace.outHit.hitActor != lookAtActor){
+      lookAtActor = sphereTrace.outHit.hitActor;
+      showMessage(displayMessage, lookAt(lookAtActor));
+    }
+  } else {
+    lookAtActor = null;
+    showMessage(displayMessage, "");
+  }
+}
+```
+
+<summary>FindSlot</summary>
+
+This is a function that searches for any slots that have items in the inventory.
+
+![imagen](https://github.com/user-attachments/assets/038700db-7085-4114-b31e-fd9766aa9f7c) [^26]
+
+[^26]: findSlot function in Unreal Engine 5
+
+```
+public FindSlot(name itemID){
+  forEach x in content{
+    if(content[x].itemName == itemID){
+      if(content[x].quantity == itemID.getMaxStackSize()){
+        return int index = content[x].arrayIndex, boolean foundSlot = true;
+      }
+    }
+  }
+  return int index = -1, boolean foundSlot = false;
+}
+```
+
+<summary>GetMaxStackSize</summary>
+
+This is a function that checks if a slot has reached the maximum amount of the item in the slot;
+
+![imagen](https://github.com/user-attachments/assets/032a6ee3-c843-4a89-a98e-04ff102da015) [^27]
+
+[^27]: GetMaxStackSize function in Unreal Engine 5
+
+```
+public GetMaxStackSize(name itemID){
+  switch(getDataTableRow("Data_Table=" Item_Data, itemID)){
+    case "Found":
+      return int stackSize = getDataTableRow("Data_Table=" Item_Data, itemID).stackSize;
+    case "NotFound":
+      return int stackSize = -1;
+  }
+}
+```
 </details>
 
 
