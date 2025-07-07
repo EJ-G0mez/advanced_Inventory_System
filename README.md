@@ -82,7 +82,7 @@ Example:
 
   This function is the core of this project, it is the system in which items are added, removed, transfered, used, etc.
 
-  ![imagen](https://github.com/user-attachments/assets/32e7b6d2-2cfd-4077-83d2-09ac555ea428) [^3]
+ ![imagen](https://github.com/user-attachments/assets/3aceb936-677c-483e-8894-e7a6ea9ac396) [^3]
   
   [^3]: Inventory System Class Diagram
 
@@ -138,7 +138,7 @@ Example:
 
     // starts at the beginning of the project
     public event Event_Begin_Play(){
-      loadInventory(self);
+      LoadInventory(self);
       content.resize(inventorySize); //sets the contents array size to 16
       displayMessage = createWidget(classtype.W_Display_Message);
       addToViewport(displayMessage);
@@ -247,7 +247,7 @@ This Event updates when there is a transfer in the inventory slots of one or mul
 
 ```
   public event Server_Transfer_Slots(int sourceIndex, Inventory_System sourceInventory,int destinationIndes){
-    transferSlots(self, sourceIndex, spurceInvenotry, destinationIndex);
+    TransferSlots(self, sourceIndex, spurceInvenotry, destinationIndex);
   }
 ```
 
@@ -283,7 +283,7 @@ This Event triggers when the player removes an item from their inventory
 
 ```
   public event Server_Remove(int index, bool removeWholeStak, bool isConsumed){
-    removeFromInventory(index, removeWholeStask, isConsumed);
+    RemoveFromInventory(index, removeWholeStask, isConsumed);
   }
 ```
 
@@ -302,7 +302,7 @@ This Event triggers when the player drops an item, for both server and client si
 ```
   public event Server_Drop_Item(name itemID, int quantity){
     if(quantity > 1){
-      addToInventory(spawnActor(/*Class=*/ classType.Loot_Bag,/*SpawnTransformLocation=*/ getDropLocation()).Inventory_System, itemID, quantity); // This will generate a loot bag with the amount of items that were dropped
+      AddToInventory(spawnActor(/*Class=*/ classType.Loot_Bag,/*SpawnTransformLocation=*/ getDropLocation()).Inventory_System, itemID, quantity); // This will generate a loot bag with the amount of items that were dropped
     } else {
       actor droppedActor = spawnActor(/*Class=*/ getItemData.itemClass, /*SpawnTransformLocation=*/ getDropLocation()); //it will create a new actor with the item characteristics and position where it was last placed
       delay(.2); // This delay is added to allow the game to save apporpirately with entering a nullPointerException
@@ -342,7 +342,7 @@ This Event triggers everytime the player loads the game, it saves to teh current
 
 ```
   public event AutoSave_Inventory(){
-    saveInventory();
+    SaveInventory();
   }
 ```
   
@@ -359,12 +359,12 @@ public AddToInventory(name itemID, int quantity){
   boolean localHasFailed;
   int localQuantityRemaining = quantity;
   while(localQuantityReaming > 0 AND !localHasFailed){
-    if(findSlot(itemID).foundSlot){
-      addToStack(findSlot(itemID).index, 1);
+    if(FindSlot(itemID).foundSlot){
+      AddToStack(findSlot(itemID).index, 1);
       localQuantityRemaining--;
     } else {
-      if(anyEmptySlotsAvailable().hasEmptySlot){
-        if(createNewStack(itemID, 1).success){
+      if(AnyEmptySlotsAvailable().hasEmptySlot){
+        if(CreateNewStack(itemID, 1).success){
           localQuantityRemaining--;
         } else {
           localHasFailed = true;
@@ -452,7 +452,7 @@ This is a function that searches for any slots that have items in the inventory.
 public FindSlot(name itemID){
   forEach x in content{
     if(content[x].itemName == itemID){
-      if(content[x].quantity == itemID.getMaxStackSize()){
+      if(content[x].quantity == itemID.GetMaxStackSize()){
         return int index = content[x].arrayIndex, boolean foundSlot = true;
       }
     }
@@ -479,8 +479,415 @@ public GetMaxStackSize(name itemID){
   }
 }
 ```
+
+<summary>AddToStack</summary>
+
+This is a function that adds an item to a slot.
+
+![imagen](https://github.com/user-attachments/assets/8d03f842-b4d7-4993-9040-491153088680) [^28]
+
+[^28]: AddtoStack function in Unreal Engine 5
+
+```
+public AddToStack(int index, int quantity){
+  setArrayElem(content, index, makeF_Slot_Struct(content[index].itemName, content[index].quantity + quantity));
+}
+```
+
+<summary>AnyEmptySlotsAvailable</summary>
+
+This is a function that checks if the player has any empty slots in their inventory.
+
+![imagen](https://github.com/user-attachments/assets/71d05f4d-30f4-4ca2-a83f-8307a92be273) [^29]
+
+[^29]: AnyEmptySlotsAvailable function in Unreal Engine 5
+
+```
+public AnyEmptySlotsAvailable(){
+  forEach x in content{
+    if (content[x].quantity == 0){
+      return boolean hasEmpltySlot = true, int emptyIndex = x;
+    }
+  }
+  return boolean hasEmpltySlot = false, int emptyIndex = -1;
+}
+```
+
+<summary>CreateNewStack</summary>
+
+This is a function that creates a new stack
+
+![imagen](https://github.com/user-attachments/assets/4fea3ece-ddf2-414d-8203-28a046b2ddab) [^30]
+
+[^30]: CreateNewStack function in Unreal Engine 5
+
+```
+public CreateNewStack(name itemID, int quantity){
+  if(AnySlotsAvailable().hasEmptySlot){
+    setArrayElem(content, AnyEmptySlotsAvailable().emptyIndex, makeF_Slot_Struvt(itemID, quantity));
+    return boolean success = true;
+  } else {
+    return boolean success = false;
+  }
+}
+```
+
+
+<summary>DEBUGPrintContent</summary>
+
+This functions' sole purpose is meant for troubleshooting, and has no defined code, overall it can be whatever purpose needed to be. althoug the output will always be a print function
+
+```
+public DEBUGPrintContent(){
+  ...
+  ...
+  printString(...);
+}
+```
+
+
+<summary>TransferSlots</summary>
+
+This function allows the player to transfer content between slots, add items to slots that do not go over the maximum stack size, adn transfer items between inventories.
+
+![imagen](https://github.com/user-attachments/assets/f6a56939-56e3-467a-b5dd-050a913ba990) [^31]
+
+[^31]: TransferSlot function in Unreal Engine 5
+
+
+```
+public TransferSlots(int sourceIndex, Inventory_System sourceInventory, int destinationIndex){
+  F_Slot_Struct localSlotContent = sourceIntventory.content[sourceindex];
+  if((destinationIndex < 0) == false){
+    //Check if there is a same item in the destination slot to add it without going the max stack size
+    if(localSlotContent.itemName == content[destinationIndex].itemName){
+      int addedQuantity = localSlotContent.quantity + content[destinationIndex].quantity;
+      int maxStackSize = GetMaxStackSize(localSlotContent.itemName);
+      //Source Index
+      setArrayElem(sourceInventory.content,
+                  sourceIndex,
+                  select(/*False=*/ None, /*True=*/ localSlotContent.itemName, /*Index=*/ clamp(addedQuantity - maxStackSize, 0, maxStakSize) > 0),
+                  clamp(addedQuantity - maxStackSize, 0, maxStakSize));
+      //Destination index
+      setArrayElem(content,
+                  destinationIndex,
+                  localSlotContent.itemName,
+                  clamp(addedQuantity, 0, mazStackSize));
+      MC_Update(self);
+      MC_Update(sourceIndex);
+    } else {
+      //source Index
+      setArrayElem(sourceInventory.content, sourceIndex, content[destination]);
+      //destination Index
+      setArrayElem(content, destinationIndex, loclaSlotContent);
+      MC_Update(self);
+      MC_Update(sourceInventory);
+    }
+  }
+}
+```
+
+<summary>GetItemData</summary>
+
+This function allows to get the item data of a specified item.
+
+![imagen](https://github.com/user-attachments/assets/8678386c-a5dc-4746-a613-9527b3152b31) [^32]
+
+[^32]: GetItemData function in Unreal Engine 5
+
+
+```
+public GetItemData(name itemID){
+  return F_Item_Struct itemData = getDataTableRow(Item_Data, nameID);
+}
+```
+
+<summary>GetDropLocation</summary>
+
+This function allows to get the position in which a player drops an item.
+
+![imagen](https://github.com/user-attachments/assets/a7e92f38-f9f3-4ebb-9469-b9adf8823664) [^33]
+
+[^33]: GetDropLocation function in Unreal Engine 5
+
+
+```
+public GetDropLocation(){
+  return Vector3 location = lineTraceByChannel( /*Start=*/ getActorLocation(getOwner()) + (randomUnitVectorinConeinDegrees(getActorForwardVector(getOwner), 30.0) * 150.0),
+                                              /*End=*/ getActorLocation(getOwner()) + (randomUnitVectorinConeinDegrees(getActorForwardVector(getOwner), 30.0) * 150.0) - Vector3(0.0, 0.0, 500.0),
+                                              /*Trace Channel=*/ "Visibility;
+                                              /*Ignore Self=*/ true).location;
+}
+```
+
+<summary>ConsumeItem</summary>
+
+This function allows the player to consume an item if it is consumable.
+
+![imagen](https://github.com/user-attachments/assets/d8906a64-b90e-4198-9c74-bfcc94339ca5) [^34]
+
+[^34]: ConsumeItem function in Unreal Engine 5
+
+
+```
+public ConsumeItem(int index){
+  name localItemID = content[index].itemName;
+  int localQuantity = content[index].quantity;
+  sequence {
+    then "0":
+      Server_Remove(self, index, false, true);
+      Server_Consume_Item(self, localItemID);
+    then "1":
+      MC_Update():
+  }
+}
+```
+
+<summary>QueryInventory</summary>
+
+This function allows for a search of a specific item in the inventory.
+
+![imagen](https://github.com/user-attachments/assets/fc940594-296f-4205-b718-446e61acb3a2) [^35]
+
+[^35]: QueryInventory function in Unreal Engine 5
+
+
+```
+public QueryInventory(name itemID, int quantity){
+  int runningTotal = 0;
+  forEach x in content{
+    if(content[x].itemName == itemID){
+      runningTotal += content[x].quantity;
+    }
+  }
+  return int oldQuantity = runningTotal, boolean success = runningTotal >= quantity
+}
+```
+
+<summary>GetQuantity</summary>
+
+This function gets the total items in an inventory.
+
+![imagen](https://github.com/user-attachments/assets/e02e806b-38b0-4bbb-a1d8-e350e5493fdc) [^36]
+
+[^36]: GetQuantity function in Unreal Engine 5
+
+
+```
+public GetQuantity(){
+  int localSum = 0;
+  forEach x in content{
+    localSum += content[x].quantity
+  }
+  return int total = localSum;
+}
+```
+
+<summary>SaveInventory</summary>
+
+This function allows the game to save all states of the current inventories in existance.
+
+![imagen](https://github.com/user-attachments/assets/b0f48d69-f2ea-4b3b-a10c-461cb69f05ee) [^37]
+
+[^37]: SaveInventory function in Unreal Engine 5
+
+
+```
+public SaveInventory(){
+  if(getOwner() == getPlayerCharacter(0)){
+    F_Slot_Struct inventoryContent[] = set(content, ((My_Game_Instance) getGameInstance()).SaveData-PlayerData);
+    SaveGametoSlot(((My_Game_Instance) getGameInstance()).SaveData-PlayerData, "MyData", 0);
+  } else {
+    add(/* target array*/ ((My_Game_Instance) getGameInstance()).SaveData-PlayerData,/*invenotry system*/ self,/*item to be added*/ makeF_Container_Struct(content));
+  }
+}
+```
+
+<summary>LoadInventory</summary>
+
+This function allows the game to load all saved inventories.
+
+![imagen](https://github.com/user-attachments/assets/d71f4a07-27af-4dc6-8066-276b89ed6d69) [^38]
+
+[^38]: LoadInventory function in Unreal Engine 5
+
+
+```
+public LoadInventory(){
+  if(getOwner() == getPlayerCharacter(0)){
+   content = ((My_Game_Instance) getGameInstance()).SaveData-PlayerData.inventoryContent
+  } else {
+    content = find(/* target array*/ ((My_Game_Instance) getGameInstance()).SaveData-PlayerData,/*invenotry system*/ self).contents;
+  }
+}
+```
+
 </details>
 
+<details>
 
+<summary>F_Item_Struct</summary>
 
+# F_Item_Struct
 
+## What's in an item
+
+This is a structure that defines what data an item has, this allows us to alter these data and move items around without much issue;.
+
+### Structure Elements
+
+![imagen](https://github.com/user-attachments/assets/75ff2d91-a444-412c-ad1f-9366f9cacea0) [^39]
+
+[^39]: F_Item_Struct class diagram
+
+![imagen](https://github.com/user-attachments/assets/fc7f6703-36bb-4522-bfe8-31c6d8bf71e2) [^40]
+
+[^40]: F_Item_Struct attributes in Unreal Engine 5
+
+```
+struct F_Itemt_Struct {
+  text name,
+  text description,
+  Texture2D thumbnail,
+  actorClass itemClass,
+  int stackSize,
+  BP_Item_Effect itemEffect,
+  category E_Item_Category
+}
+```
+</details>
+
+<details>
+
+<summary>E_Item_Category</summary>
+
+# E_Item_Category
+
+## What kind of item is this
+
+This is an enumator that classifies the items to different categories.
+
+### Enumator 
+
+![imagen](https://github.com/user-attachments/assets/f170cdfd-7f6b-42a6-81c2-6bfa2f110288) [^41]
+
+[^41]: E_Item_Category class diagram
+
+![imagen](https://github.com/user-attachments/assets/8f6881f2-e6a6-447e-9eb7-2b7c87394908) [^42]
+
+[^42]: E_Item_Category Values in Unreal Engine 5
+
+```
+enum E_Item_Category {
+  Food,
+  Material,
+  Equipment,
+  Potion,
+  Junk
+}
+```
+</details>
+
+<details>
+
+<summary>F_Slot_Struct</summary>
+
+# F_Item_Struct
+
+## What's can we change in the item slot?
+
+This is a structure that defines what data is being shown for an item slot to be altered and changed in the code
+
+### Structure Elements
+
+![imagen](https://github.com/user-attachments/assets/18bf0fbf-6a22-44da-afbf-8fc23b4907b3) [^43]
+
+[^43]: F_Slot_Struct class diagram
+
+![imagen](https://github.com/user-attachments/assets/4cde0281-3092-4e31-929e-18314f552df9) [^44]
+
+[^44]: F_Slot_Struct attributes in Unreal Engine 5
+
+```
+struct F_Slot_Struct {
+  name itemID,
+  int quantity
+}
+```
+</details>
+
+<details>
+
+<summary>I_Interact_Interface</summary>
+
+# I_Interact_Interface
+
+## How can we interact
+
+This is an interface with the sole purpose of giving certain functions that allows players to interact with certain objects.
+
+### interface 
+
+![imagen](https://github.com/user-attachments/assets/4d552861-cad2-4aec-b845-8016ccd89038) [^45]
+
+[^45]: I_Interact_Interface class diagram
+
+![imagen](https://github.com/user-attachments/assets/23199bf2-8c3a-43d8-80ac-6d57c36672c9) [^46]
+
+[^46]: I_Interact_Interface in Unreal Engine 5
+
+```
+public class interface E_Item_Category {
+
+  public lookAt();
+
+  public interactWith();
+}
+```
+</details>
+
+<details>
+
+<summary>DD_Inventory_Slot</summary>
+
+# DD_Inventory_Slot
+
+## Drag and Drop items
+
+This is an Drag and Drop blueprint structure that allows the player to drag and drop items from their inventories
+
+### Class structure
+
+![imagen](https://github.com/user-attachments/assets/2527deb8-f745-4c3d-9508-e507073bd3c0) [^47]
+
+[^47]: DD_Inventory_Slot class diagram
+
+```
+#import Inventory_System
+
+public class DD_Inventory_Slot{
+
+  Inventory_System invenotry;
+  int contentIndex;
+
+....
+}
+```
+
+<summary>Event Graph</summary>
+
+<ins>Event_DragCancelled</ins>
+
+This event happens when the player stops the dragging of the mouse, it call the remove from inventory.
+
+![imagen](https://github.com/user-attachments/assets/0613ea6e-10af-484c-946b-034cde26c89d) [^48]
+
+[^48]: Event_DragCancelled event in Unreal Engine 5.
+
+```
+public event Event_DragCancelled(){
+    RemoveFromInventory(inventory, contentIndex, true, false);
+}
+```
+
+</details>
