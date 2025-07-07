@@ -307,7 +307,7 @@ This Event triggers when the player drops an item, for both server and client si
       actor droppedActor = spawnActor(/*Class=*/ getItemData.itemClass, /*SpawnTransformLocation=*/ getDropLocation()); //it will create a new actor with the item characteristics and position where it was last placed
       delay(.2); // This delay is added to allow the game to save apporpirately with entering a nullPointerException
       Save_Data_Level saveData = ((BPThirdPersonGameMode) getGameMode()).Save_Data_Level; //We have the save data of Game
-      add(saveData.actorAdded, (soft reference) getItemData.itemClass, getActorTransform(droppedActor)); //we add the dropped items to the save data
+      add(saveData.actorAdded, (soft reference) getItemData.itemClass, getActorTransform(droppedActor)); //we add the dropped items to the save data distionary
       saveGameToSlot(saveData, ((BPThirdPersonGameMode) getGameMode()).levelDataSlot); //we save the game in a save file
       DEBUGPrintContent();
     }
@@ -887,6 +887,131 @@ This event happens when the player stops the dragging of the mouse, it call the 
 ```
 public event Event_DragCancelled(){
     RemoveFromInventory(inventory, contentIndex, true, false);
+}
+```
+
+</details>
+
+<details>
+
+<summary>Item_Data</summary>
+
+# Item_Data
+
+## Every single item
+
+This is a Data Table with the F_Data_Structure Data base, this allows us to add different types of items into the project.
+
+### Current Data.
+
+![imagen](https://github.com/user-attachments/assets/ca572b55-6800-4e6e-959e-96091e2e8bff) [^49]
+
+[^49]: Item_Data Data Table diagram
+
+![imagen](https://github.com/user-attachments/assets/85d57a2e-e094-4496-a785-5a2f7db3d25a) [^50]
+
+[^50]: Item_Data configuration in Unreal Engine 5
+
+</details>
+
+<details>
+
+<summary>Item_Data_Component</summary>
+
+# Item_Data_Component
+
+## How we add the items to an ivnentory
+
+This is a component blueprint that is attached to items, so anyone can add them to their inventory. It has all the data from the specific item that is being added.
+
+### Class structure
+
+![imagen](https://github.com/user-attachments/assets/61c242af-ee49-4672-a46c-b1b5e55c1a3c) [^51]
+
+[^51]: Item_Data_Component class diagram
+
+```
+#import Item_Data
+#import Inventory_System
+
+
+public class Item_Data_Component implements I_Interact_Interface{
+
+  Data_Table_Row itemID;
+  int quantity
+
+....
+}
+```
+
+<summary>Event Graph</summary>
+
+<ins>Event_InteractWith</ins>
+
+This event happens when a player interacts with the item.
+
+![imagen](https://github.com/user-attachments/assets/89d7ca00-3b1a-4a44-ad84-088109f0d39e) [^52]
+
+[^52]: Event_InteractWith event in Unreal Engine 5.
+
+```
+public event Event_InteractWith(BPThirdPersonCharacter playerCharacter){
+    if(isValid(playerCharacter.inventorySystem)){
+      if(AddToInventory(playerCharacter.inventorySystem, itemID.rowName, quantity).success){
+        destroyActor(getOwner());
+      }
+    }
+}
+```
+
+</details>
+
+<details>
+
+<summary>Chest</summary>
+
+# Chest
+
+## A simple container with an inventory
+
+An actor that functions as a chest with
+
+### Class structure
+
+![imagen](https://github.com/user-attachments/assets/61c242af-ee49-4672-a46c-b1b5e55c1a3c) [^51]
+
+[^51]: Item_Data_Component class diagram
+
+```
+#import Item_Data
+#import Inventory_System
+
+public class Item_Data_Component{
+
+  Data_Table_Row itemID;
+  int quantity
+
+....
+}
+```
+
+<summary>Event Graph</summary>
+
+<ins>Event_InteractWith</ins>
+
+This event happens when a player interacts with the item.
+
+![imagen](https://github.com/user-attachments/assets/89d7ca00-3b1a-4a44-ad84-088109f0d39e) [^52]
+
+[^52]: Event_InteractWith event in Unreal Engine 5.
+
+```
+public event Event_InteractWith(BPThirdPersonCharacter playerCharacter){
+    if(isValid(playerCharacter.inventorySystem)){
+      if(AddToInventory(playerCharacter.inventorySystem, itemID.rowName, quantity).success){
+        destroyActor(getOwner());
+      }
+    }
 }
 ```
 
