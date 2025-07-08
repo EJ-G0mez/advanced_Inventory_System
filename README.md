@@ -237,13 +237,13 @@ A simple debugging event that triggers everytime "I" is pressed.
 
 This Event updates when there is a transfer in the inventory slots of one or multiple inventories.
 
-![imagen](https://github.com/user-attachments/assets/ae0f49cd-2681-4823-8d3a-d82089881db4) [^11]
+![imagen](https://github.com/user-attachments/assets/ae0f49cd-2681-4823-8d3a-d82089881db4) [^12]
 
-[^11]: Server_Transfer_Slots Details in Unreal Engine 5
+[^12]: Server_Transfer_Slots Details in Unreal Engine 5
 
-![imagen](https://github.com/user-attachments/assets/aee8b24f-758e-40bb-9568-00fd2f524a20) [^12]
+![imagen](https://github.com/user-attachments/assets/aee8b24f-758e-40bb-9568-00fd2f524a20) [^13]
 
-[^12]: Server_Transfer_Slots Event in Unreal Engine 5
+[^13]: Server_Transfer_Slots Event in Unreal Engine 5
 
 ```
   public event Server_Transfer_Slots(int sourceIndex, Inventory_System sourceInventory,int destinationIndes){
@@ -255,13 +255,13 @@ This Event updates when there is a transfer in the inventory slots of one or mul
 
 This Event triggers when the player locally interacts with the object
 
-![imagen](https://github.com/user-attachments/assets/c450e0e0-c2c7-4ce5-87b5-a31151a0e44d) [^13]
+![imagen](https://github.com/user-attachments/assets/c450e0e0-c2c7-4ce5-87b5-a31151a0e44d) [^14]
 
-[^13]: OnLocalInteract Details in Unreal Engine 5
+[^14]: OnLocalInteract Details in Unreal Engine 5
 
-![imagen](https://github.com/user-attachments/assets/2600df71-df9f-41fe-ae80-1e118977a99a) [^14]
+![imagen](https://github.com/user-attachments/assets/2600df71-df9f-41fe-ae80-1e118977a99a) [^15]
 
-[^14]: Server_Transfer_Slots Event in Unreal Engine 5
+[^15]: Server_Transfer_Slots Event in Unreal Engine 5
 
 ```
   public event OnLocalInteract(actor targetActor, actor interactor){
@@ -273,13 +273,13 @@ This Event triggers when the player locally interacts with the object
 
 This Event triggers when the player removes an item from their inventory
 
-![imagen](https://github.com/user-attachments/assets/ff1d9ff9-c840-4126-8ceb-34284712acfc) [^15]
+![imagen](https://github.com/user-attachments/assets/ff1d9ff9-c840-4126-8ceb-34284712acfc) [^16]
 
-[^15]: Server_Remove Details in Unreal Engine 5
+[^16]: Server_Remove Details in Unreal Engine 5
 
-![imagen](https://github.com/user-attachments/assets/62c430bf-8abf-41ba-8c24-6d2468d6a19e) [^16]
+![imagen](https://github.com/user-attachments/assets/62c430bf-8abf-41ba-8c24-6d2468d6a19e) [^17]
 
-[^16]: Server_Transfer_Slots Event in Unreal Engine 5
+[^17]: Server_Transfer_Slots Event in Unreal Engine 5
 
 ```
   public event Server_Remove(int index, bool removeWholeStak, bool isConsumed){
