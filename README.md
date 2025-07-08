@@ -974,22 +974,26 @@ public event Event_InteractWith(BPThirdPersonCharacter playerCharacter){
 
 ## A simple container with an inventory
 
-An actor that functions as a chest with
+An actor that functions as a chest with its own inventory System
 
 ### Class structure
 
-![imagen](https://github.com/user-attachments/assets/61c242af-ee49-4672-a46c-b1b5e55c1a3c) [^51]
+![imagen](https://github.com/user-attachments/assets/7fc3f0ab-e974-4d34-ab50-eebf25779aa8) [^53]
 
-[^51]: Item_Data_Component class diagram
+[^53]: Chest class diagram
+
+![imagen](https://github.com/user-attachments/assets/c5ad802e-2a17-48b4-9df0-9e6531f1a390) [^54]
+
+[^54]: Chest Viewport in Unreal Engine 5
 
 ```
-#import Item_Data
 #import Inventory_System
 
-public class Item_Data_Component{
+public class Chest implements I_Interact_Interface{
 
-  Data_Table_Row itemID;
-  int quantity
+  private Inventory_System Inventory_System;
+  private StaticMesh Cone;
+  private Scene_Component DefaultSceneRoot;
 
 ....
 }
@@ -999,19 +1003,485 @@ public class Item_Data_Component{
 
 <ins>Event_InteractWith</ins>
 
-This event happens when a player interacts with the item.
+This event happens when a player interacts with the chest, it allows to open the chest's inventory.
 
-![imagen](https://github.com/user-attachments/assets/89d7ca00-3b1a-4a44-ad84-088109f0d39e) [^52]
+![imagen](https://github.com/user-attachments/assets/411133ab-7c36-48c9-8977-a528684c1c93) [^55]
 
-[^52]: Event_InteractWith event in Unreal Engine 5.
+[^55]: Event_InteractWith event in Unreal Engine 5.
 
 ```
 public event Event_InteractWith(BPThirdPersonCharacter playerCharacter){
-    if(isValid(playerCharacter.inventorySystem)){
-      if(AddToInventory(playerCharacter.inventorySystem, itemID.rowName, quantity).success){
-        destroyActor(getOwner());
-      }
-    }
+   try {
+    ShowContainer(((MyPlayerController) GetPlayerController()).HUD, Inventory_System);
+  }
+}
+```
+
+</details>
+
+<details>
+
+<summary>Loot_Bag</summary>
+
+# Loot_bag
+
+## A simple container with an inventory that is made when you drop a lot of items
+
+An actor that functions as a loot bag with an Inventory System. this actor generates when you drop more than one item to the ground. it inherits its elements from the chest actor
+
+### Class structure
+
+![imagen](https://github.com/user-attachments/assets/4dd1bbdf-a9f7-4b1e-8719-840674c2c3b4) [^56]
+
+[^56]: Loot_Bag class diagram
+
+![imagen](https://github.com/user-attachments/assets/22213439-4864-4b24-a232-3313557fb26b) [^57]
+
+[^57]: Loot_Bag Viewport in Unreal Engine 5
+
+```
+#import Inventory_System
+
+public class Loot_Bag extends Chest{
+
+  private Inventory_System Inventory_System = super.Inventory_System;
+
+....
+}
+```
+
+<summary>Event Graph</summary>
+
+<ins>Event BeginPlay</ins>
+
+This event happens the project starts, this saves the current containers in the scene to be loaded later.
+
+![imagen](https://github.com/user-attachments/assets/2dff7b3a-a0c5-4e81-bf06-f120ee24edec) [^58]
+
+[^58]: Event BeginPlay event in Unreal Engine 5.
+
+```
+public event BeginPlay(){
+   super.BeginPlay();
+  try {
+    add(((BP_ThirdPersonGameMode) getGameMode()).SaveData-Level.actorsAdded, (soft_referece) getClass(self), getActorTransform(self));
+    SaveGameToSlot(((BP_ThirdPersonGameMode) getGameMode()).SaveData-Level, ((BP_ThirdPersonGameMode) getGameMode()).LevelDataSlot, 0);
+  }
+}
+```
+
+<ins>Event Destroyed</ins>
+
+This event happens the loot bag is destroyed, this saves the destroyed containers in the scene to be recorded as destroyed.
+
+![imagen](https://github.com/user-attachments/assets/b7cac0ac-9019-4b4a-8655-fe0c9047abfc) [^59]
+
+[^59]: Event Destroyed event in Unreal Engine 5.
+
+```
+public event Destroyed(){
+   super.Destroyed();
+  try {
+    addUnique(((BP_ThirdPersonGameMode) getGameMode()).SaveData-Level.actorsRemoved, (soft_referece) self);
+  }
+}
+```
+
+<ins>Event On_Inventory_Update</ins>
+
+This event happens the loot bag's invenotry is update, if the loot bag is empty, it will be destroyed.
+
+![imagen](https://github.com/user-attachments/assets/f304f8f4-2d16-4c1f-b7c6-4acce104d205) [^60]
+
+[^60]: Event On_Inventory_Update event in Unreal Engine 5.
+
+```
+public event On_Inventory_Update(){
+   if(Inventory_System.GetQuantity() <= 0){
+    RemoveFromParent(((MyPlayerController) getPLayerController(0)).HUD);
+    DestroyActor();
+  }
+}
+```
+</details>
+
+<details>
+
+<summary>TEST_item</summary>
+
+# TEST_item
+
+## A simple item blueprint for all other items
+
+An actor that is basicaaly an item with no function or description
+
+### Class structure
+
+![imagen](https://github.com/user-attachments/assets/7167491a-56e0-4095-828c-2bc19e937886) [^61]
+
+[^61]: TEST_Item class diagram
+
+![imagen](https://github.com/user-attachments/assets/a5a7faa5-e2c6-4f1a-9760-b1ec1229ab4b) [^62]
+
+[^62]: TEST_Item Viewport in Unreal Engine 5
+
+```
+#import Item_Data_Component
+
+public class TEST_Item implements I_Interact_Interface{
+
+  private Item_Data_Component Item_Data_Component;
+  private StaticMesh Cube;
+  private Scene_Component DefaultSceneRoot;
+
+....
+}
+```
+
+<summary>Event Graph</summary>
+
+<ins>Event Destroyed</ins>
+
+This event happens when a player grabs the item and is later on destroyed, this also saves to the current save file
+
+![imagen](https://github.com/user-attachments/assets/215b7a63-e133-4ddb-ae4b-62e1dbed2a42) [^63]
+
+[^63]: Event Destroyed event in Unreal Engine 5.
+
+```
+public event Destroyed(){
+   try {
+    addUnique(((BP_ThirdPersonGameMode) getGameMode()).SaveData-Level.actorsRemoved, (soft_reference) self);
+  }
+}
+```
+
+<summary>LookAt</summary>
+
+The function from the I_Interact_Interface, this will show a message with the item name everytime the player is looking at an item.
+
+![imagen](https://github.com/user-attachments/assets/1614d6f1-312d-4053-852e-1185fc9f297e) [^64]
+
+[^64]: LookAt function in Unreal Engine 5
+
+```
+public LookAt(){
+  return text Message = FormatText("Pick up " + breakF_ItemStruct(getDataTableRow(Item_Data_Component.Data_Table, Item_Data_Component.Row_Name)).name);
+}
+```
+
+</details>
+
+<details>
+
+<summary>Apple</summary>
+
+# Apple
+
+## A simple apple
+
+An apple actor that is being used to test the inventory system, it inherets all the attributes from the TEST_Item Actor
+
+### Class structure
+
+![imagen](https://github.com/user-attachments/assets/910e137b-9406-4646-b495-aa694ff7f3fd) [^65]
+
+[^65]: Apple class diagram
+
+![imagen](https://github.com/user-attachments/assets/a5a7faa5-e2c6-4f1a-9760-b1ec1229ab4b) [^66]
+
+[^62]: Apple Viewport in Unreal Engine 5
+
+```
+#import Item_Data_Component
+
+public class Apple implements I_Interact_Interface extends TEST_Item{
+
+  private Item_Data_Component Item_Data_Component = super.Item_Data_Component;
+  private StaticMesh Cube = super.Cube;
+  private Scene_Component DefaultSceneRoot = super.DefaultSceneRoot;
+
+  public event Destroyed{
+      super.Destroyed();
+  }
+
+  public LookAt(){
+    super.LookAt();
+  }
+
+}
+```
+</details>
+
+<details>
+
+<summary>BP_Item_Effect</summary>
+
+# BP_Item_Effect
+
+## Give Players Effects
+
+This Blueprint is meant to give the player effects from any item that gives an effect
+
+### BP Configuration
+
+![imagen](https://github.com/user-attachments/assets/a63d3829-e0d4-42eb-8fd2-6b558ee66501) [^67]
+
+[^67]: BP_Item_Effect class diagram
+
+![imagen](https://github.com/user-attachments/assets/232127a7-995d-48e4-be92-d76c2c9e9f7c) [^68]
+
+[^68]: BP_Item_Effect in Unreal Engine 5
+
+```
+public class BP_Item_Effect {
+
+.....
+}
+```
+</details>
+
+<details>
+
+<summary>Effect_Heal_Player</summary>
+
+# Effect_Heal_Player
+
+## A healing effect
+
+This BP Effect simulates the healing of a player, it just prints a text that says it healed the player.
+
+### BP Configuration
+
+![imagen](https://github.com/user-attachments/assets/64d7ad2f-79de-4326-a8be-db2610816212) [^69]
+
+[^69]: BP_Item_Effect class diagram
+
+```
+public abstract class Effect_Heal_Player extends BP_Item_Effect{
+  .....
+}
+```
+
+<summary>Event Graph</summary>
+
+<ins>BeginPlay</ins>
+
+This Event just prints "Healed Player"
+
+![imagen](https://github.com/user-attachments/assets/d1c03196-72d2-4dd6-8aea-25e47e162197) [^70]
+
+[^70]: BP_Item_Effect in Unreal Engine 5
+
+```
+public event BeginPlay() {
+  PrintString("Healed Player");
+}
+```
+</details>
+
+<details>
+
+<summary>W_action_Menu</summary>
+
+# W_action_Menu
+
+## Let's use our items
+
+This is a UI that creates a menu inside the inventory. When you right click you have the option to use, drop 1, or drop all items in the slot.
+
+### Widget Configuration
+
+![imagen](https://github.com/user-attachments/assets/ca62b84c-7df3-4a5d-ac06-c3ea6a9a30be) [^71]
+
+[^71]: W_action_Menu class diagram
+
+![imagen](https://github.com/user-attachments/assets/5245f984-2063-4add-9dcb-3ffd6b3a9966) [^72]
+
+[^72]: W_action_Menu designer in Unreal Engine 5
+
+```
+#import Inventory_System
+
+public class W_action_Menu{
+
+  private Vertical_Box BOX_Action_Menu;
+  private Button BTN_Drop;
+  private Button BTN_Drop_All;
+  private Button BTN_Use;
+  public int index;
+  public Inventory_System Inventory_System;
+
+  ........
+}
+```
+
+<summary>Event Graph</summary>
+
+<ins>Construct</ins>
+
+This Events allows for the menu to appear when the the mouse right click is done.
+
+![imagen](https://github.com/user-attachments/assets/72ddc649-7c9c-42a6-9760-db2fe39ea935) [^73]
+
+[^73]: Construct in Unreal Engine 5
+
+```
+public event Construct() {
+  SetPosition(SlotasCanvasSlot(BOX_Action_Menu), GetMousePositionOnViewport());
+}
+```
+
+<ins>OnMouseLeave</ins>
+
+This Events allows for the menu to disappear when the player no,onger hovers the mouse over the menu
+
+![imagen](https://github.com/user-attachments/assets/20da064f-ca4c-4ddc-92a7-a2f00d3e8be6) [^74]
+
+[^74]: OnMouseLeave in Unreal Engine 5
+
+```
+public event OnMouseLeave() {
+  RemoveFromParent(self);
+}
+```
+
+<ins>OnClickedBTN_Drop</ins>
+
+This Events remove an item in the slot from the inventory when clicking the "Drop" button
+
+![imagen](https://github.com/user-attachments/assets/72224506-d9c8-42e0-b00b-8e28c2102060) [^75]
+
+[^75]: OnClickedBTN_Drop in Unreal Engine 5
+
+```
+public event OnClickedBTN_Drop() {
+  Server_Remove(Inventory_System, index, false, false);
+}
+```
+
+<ins>OnClickedBTN_Drop_All</ins>
+
+This Events remove all items in the slot from the inventory when clicking the "Drop All" button
+
+![imagen](https://github.com/user-attachments/assets/1d435c6e-8f6a-4f83-bf45-df2480af72f0) [^76]
+
+[^76]: OnClickedBTN_Drop_All in Unreal Engine 5
+
+```
+public event OnClickedBTN_Drop_All() {
+  Server_Remove(Inventory_System, index, true, false);
+}
+```
+
+<ins>OnClickedBTN_Use</ins>
+
+This Events remove an item in the slot from the inventory when clicking the "Use" button, and consumes it, this gives the player an effect
+
+![imagen](https://github.com/user-attachments/assets/360a8836-bfb4-4bd3-afdc-b2f226f4dfbb) [^78]
+
+[^78]: OnClickedBTN_Use in Unreal Engine 5
+
+```
+public event OnClickedBTN_Use() {
+  Consume_Item(Inventory_System, index);
+}
+```
+</details>
+
+<details>
+
+<summary>W_Container_Inventory</summary>
+
+# W_Container_Inventory
+
+## What's in an Chest
+
+This is a UI that creates the inventory of a container alongside the invenotry of the player.
+
+### Widget Configuration
+
+![imagen](https://github.com/user-attachments/assets/b473ac50-74c2-49a9-9b6c-039a6c68c832) [^79]
+
+[^79]: W_Container_Inventory class diagram
+
+![imagen](https://github.com/user-attachments/assets/7346c2b7-8b2b-4846-bed9-aae1f7cbdd2d) [^80]
+
+[^80]: W_Container_Inventory designer in Unreal Engine 5
+
+```
+#import Inventory_System
+
+public class W_Container_Inventory{
+
+  private ContainerInventoryGrid W_Inventory_Grid;
+  private PlayerInventoryGrid W_Inventory_Grid;
+  public Inventory_System ContainerInventoryComp;
+  ........
+}
+```
+
+<summary>Event Graph</summary>
+
+<ins>PreConstruct</ins>
+
+This Events allows for the inventory to be generated before during the project loading. It displays both the conainters inventory and the player's
+
+![imagen](https://github.com/user-attachments/assets/7a7ed99b-6550-4121-bf38-e15a5d40c799) [^81]
+
+[^81]: PreConstruct in Unreal Engine 5
+
+```
+public event PreConstruct() {
+  DisplayInventory(PlayerInventoryGrid, getComponentByClass(getPlayerCharacter(), "Inventory_System"));
+  DisplayInventory(ContainerInventoryGrid, ContainerInventoryComp);
+}
+```
+
+<ins>Construct</ins>
+
+This Events allows for when the container inventory is show, it makes the game use mouse only.
+![imagen](https://github.com/user-attachments/assets/bc8c2fd4-32fd-4e63-88ae-9da92ddd53d1) [^82]
+
+[^82]: Construct in Unreal Engine 5
+
+```
+public event Construct() {
+  setInpuModeUIOnly(getPlayerController(0), ContainerInventoryGrid, "Do Not Look", false);
+  setMouseCursor(true, getPlayerController(0));
+}
+```
+
+<ins>Destruct</ins>
+
+This Events removes the Mouse only option from the project when the container inventory is removed
+
+![imagen](https://github.com/user-attachments/assets/2193edcf-84d0-4d4b-8def-715a3d54c4d6) [^83]
+
+[^83]: Destruct in Unreal Engine 5
+
+```
+public event Destruct() {
+  if(isValid(getPlayerController(0))){
+    setInputModeGameOnly(getPlayerController(0), false);
+    setMouseCursor(false, getPlayerController(0));
+  }
+}
+```
+<summary>OnKeyDown</summary>
+
+This is a function that closes the container's inventory when a specified button is pressed
+
+![imagen](https://github.com/user-attachments/assets/9eee59e4-0079-4872-b6c3-314cc6bcc21b) [^84]
+
+[^84]: OnKeyDown in Unreal Engine 5
+
+```
+public OnKeyDown(KeyEvent InKeyEvent){
+  if(getKey(InKeyEvent)) == "E" || getKey(InKeyEvent)) == "Gamepad Face Button Right" || getKey(InKeyEvent)) == "Gamepad Special Right"){
+    removeFromParent(self);
+    return EventReply value = handled();
+  }
 }
 ```
 
