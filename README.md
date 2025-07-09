@@ -1486,3 +1486,176 @@ public OnKeyDown(KeyEvent InKeyEvent){
 ```
 
 </details>
+
+<details>
+
+<summary>W_Display_Message</summary>
+
+# W_Display_Message
+
+## Shwoing the item message
+
+This is a UI that creates a message when the player is looking at an item that can be pick uped.
+
+### Widget Configuration
+
+![imagen](https://github.com/user-attachments/assets/73744899-6e70-4cd0-9420-908e4cb09900) [^85]
+
+[^85]: W_Display_Message class diagram
+
+![imagen](https://github.com/user-attachments/assets/cffb6007-768e-4f69-a9a4-755bd37e183d) [^86]
+
+[^86]: W_Display_Message designer in Unreal Engine 5
+
+```
+public class W_Display_Message{
+
+  private TextBox TXT_Message;
+  private Border BOX_Meesage;
+  private text message;
+  ........
+}
+```
+
+<summary>Event Graph</summary>
+
+<ins>PreConstruct</ins>
+
+This Events allows for the message to be made, it is set as "No-Hit" as default so it will not show up at all times
+
+![imagen](https://github.com/user-attachments/assets/9e184eb7-4487-4d65-8004-a22c25de41d5) [^87]
+
+[^87]: PreConstruct in Unreal Engine 5
+
+```
+public event PreConstruct() {
+  setText(TXT_Message, message);
+  if(!message.isEmpty()){
+    setVisibility(self, "Not Hit-Testable");
+  }else {
+    setVisibility(self, "Hidden");
+  }
+}
+```
+
+<ins>Show_Message</ins>
+
+This Events allows for message to be shown when an item is nearby.
+
+![imagen](https://github.com/user-attachments/assets/a789d348-e497-4977-acbf-e783dc4be325) [^88]
+
+[^88]: Show_Message in Unreal Engine 5
+
+```
+public event Show_Message(text message) {
+  message = this.message;
+    setText(TXT_Message, message);
+  if(!message.isEmpty()){
+    setVisibility(self, "Not Hit-Testable");
+  }else {
+    setVisibility(self, "Hidden");
+  }
+}
+```
+</details>
+
+<details>
+
+<summary>W_Drag_Preview</summary>
+
+# W_Drag_Preview
+
+## Showing a preview while dragging the mouse
+
+This is a UI that creates a preview of the selected item when it is dragged with the mouse
+
+### Widget Configuration
+
+![imagen](https://github.com/user-attachments/assets/2f16256b-b2d7-4033-86c6-de74ba77f6fc) [^89]
+
+[^89]: W_Drag_Preview class diagram
+
+![imagen](https://github.com/user-attachments/assets/6316491b-3c2b-4521-8e63-89dd617f00bb) [^90]
+
+[^90]: W_Drag_Preview designer in Unreal Engine 5
+
+```
+public class W_Drag_Preview{
+
+  private Image Image32;
+  public name itemID;
+  ........
+}
+```
+
+<summary>Event Graph</summary>
+
+<ins>PreConstruct</ins>
+
+This Events allows for the preview to be made, it gets the specific item's data being seen.
+
+![imagen](https://github.com/user-attachments/assets/9e184eb7-4487-4d65-8004-a22c25de41d5) [^91]
+
+[^91]: PreConstruct in Unreal Engine 5
+
+```
+public event PreConstruct() {
+  setBrushFromTextyue(Image32, break(getTableFromRow(Item_Data, itemID)).thumbnail);
+}
+```
+
+</details>
+
+<details>
+
+<summary>W_Hotbar</summary>
+
+# W_Hotbar
+
+## A Hotbar for pinning spcific items
+
+This is a UI that creates a Hotbar for the player to pin certain items into the hotbar slots
+
+### Widget Configuration
+
+![imagen](https://github.com/user-attachments/assets/2f16256b-b2d7-4033-86c6-de74ba77f6fc) [^89]
+
+[^89]: W_Hotbar class diagram
+
+![imagen](https://github.com/user-attachments/assets/6316491b-3c2b-4521-8e63-89dd617f00bb) [^90]
+
+[^90]: W_Hotbar designer in Unreal Engine 5
+
+```
+public class W_Drag_Preview{
+
+  private W_Hotbar_Slot W_Hotbar_Slot;
+  private W_Hotbar_Slot W_Hotbar_Slot_1;
+  private W_Hotbar_Slot W_Hotbar_Slot_2;
+  private W_Hotbar_Slot W_Hotbar_Slot_3;
+  private W_Hotbar_Slot W_Hotbar_Slot_4;
+  private W_Hotbar_Slot W_Hotbar_Slot_5;
+  private W_Hotbar_Slot W_Hotbar_Slot_6;
+  private W_Hotbar_Slot W_Hotbar_Slot_7;
+  
+  ........
+}
+```
+
+<summary>Event Graph</summary>
+
+<ins>PreConstruct</ins>
+
+This Events allows for the preview to be made, it gets the specific item's data being seen.
+
+![imagen](https://github.com/user-attachments/assets/9e184eb7-4487-4d65-8004-a22c25de41d5) [^91]
+
+[^91]: PreConstruct in Unreal Engine 5
+
+```
+public event PreConstruct() {
+  setBrushFromTextyue(Image32, break(getTableFromRow(Item_Data, itemID)).thumbnail);
+}
+```
+
+</details>
