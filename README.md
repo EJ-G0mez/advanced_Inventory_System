@@ -1618,16 +1618,16 @@ This is a UI that creates a Hotbar for the player to pin certain items into the 
 
 ### Widget Configuration
 
-![imagen](https://github.com/user-attachments/assets/2f16256b-b2d7-4033-86c6-de74ba77f6fc) [^89]
+![imagen](https://github.com/user-attachments/assets/79a3a075-0441-4075-992a-7bf50af7c6d7) [^92]
 
-[^89]: W_Hotbar class diagram
+[^92]: W_Hotbar class diagram
 
-![imagen](https://github.com/user-attachments/assets/6316491b-3c2b-4521-8e63-89dd617f00bb) [^90]
+![imagen](https://github.com/user-attachments/assets/87352344-55eb-485b-8b93-3a9f05cc703b) [^93]
 
-[^90]: W_Hotbar designer in Unreal Engine 5
+[^93]: W_Hotbar designer in Unreal Engine 5
 
 ```
-public class W_Drag_Preview{
+public class W_Hotbar{
 
   private W_Hotbar_Slot W_Hotbar_Slot;
   private W_Hotbar_Slot W_Hotbar_Slot_1;
@@ -1646,16 +1646,261 @@ public class W_Drag_Preview{
 
 <ins>PreConstruct</ins>
 
-This Events allows for the preview to be made, it gets the specific item's data being seen.
+This Events allows for the Hotbar to be generated, and to load any saved hotbars from the save file, this also creates a new Event called "OnHotBarUpdated".
 
-![imagen](https://github.com/user-attachments/assets/9e184eb7-4487-4d65-8004-a22c25de41d5) [^91]
+![imagen](https://github.com/user-attachments/assets/e23e4cd4-9b47-45dd-aea6-14b826f9aea0) [^94]
 
-[^91]: PreConstruct in Unreal Engine 5
+[^94]: PreConstruct in Unreal Engine 5
 
 ```
 public event PreConstruct() {
-  setBrushFromTextyue(Image32, break(getTableFromRow(Item_Data, itemID)).thumbnail);
+  BindEvent(/*Event=*/ CreateEvent(self, "OnHotBarUpdated(slot)"),
+            /*Targets*/ W_Hotbar_Slot,
+            W_Hotbar_Slot_1,
+            W_Hotbar_Slot_2,
+            W_Hotbar_Slot_3,
+            W_Hotbar_Slot_4,
+            W_Hotbar_Slot_5,
+            W_Hotbar_Slot_6,
+            W_Hotbar_Slot_7);
+  delay(1.0);
+  LoadHotbar();
 }
 ```
 
+
+<ins>OnHotbarUpdated</ins>
+
+This Events is active when any change is done in a slot of the hotbar, it also automatically saves the current hotbar when it is updated.
+
+![imagen](https://github.com/user-attachments/assets/9041e5a9-bd6f-4113-a68a-748dcd3be417) [^95]
+
+[^95]: OnHotbarUpdated in Unreal Engine 5
+
+```
+public event OnHotBarUpdated(W_Hotbar_Slot slot) {
+   forEach x in MakeArray( W_Hotbar_Slot, W_Hotbar_Slot_1, W_Hotbar_Slot_2, W_Hotbar_Slot_3, W_Hotbar_Slot_4, W_Hotbar_Slot_5, W_Hotbar_Slot_6, W_Hotbar_Slot_7){
+    if(x.inventoryIndex == slot.inventoryIndex AND x != slot){
+      slot.inventoryIndex = -1;
+      OnHotbarUpdated(slot);
+    }
+  }
+  SaveHotbar();
+}
+```
+
+<summary>SaveHotbar</summary>
+
+This function saves the current Hotbar slots so it will load on the next load.
+
+![imagen](https://github.com/user-attachments/assets/da1023df-448e-441d-a986-5a14201d000b) [^96]
+
+[^96]: SaveHotbar function in Unreal Engine 5
+
+```
+
+public SaveHotbar(){
+  int[] localHotbarContent;
+  forEach x in MakeArray( W_Hotbar_Slot, W_Hotbar_Slot_1, W_Hotbar_Slot_2, W_Hotbar_Slot_3, W_Hotbar_Slot_4, W_Hotbar_Slot_5, W_Hotbar_Slot_6, W_Hotbar_Slot_7){
+    setArrayElem(localHotbarElem, x.index, x.inventoryIndex, true);
+  }
+  ((My_Game_Instance) GetGameInstance()).SaveData-PlayerData.hotbarContent = localHotbarContent;
+  SaveGameToSlot(((My_Game_Instance) GetGameInstance()).SaveData-PlayerData, "MyData", 0);
+}
+
+```
+
+<summary>LoadHotbar</summary>
+
+This function loads the saved Hotbar slots at the beginning at the project.
+
+![imagen](https://github.com/user-attachments/assets/100e28ae-b833-49d8-9e78-3b9d7eb6af68) [^97]
+
+[^97]: LoadHotbar function in Unreal Engine 5
+
+```
+
+public SaveHotbar(){
+  SaveData-PlayerData localSaveData = ((My_Game_Instance) GetGameInstance()).SaveData-PlayerData;
+  forEach x in MakeArray( W_Hotbar_Slot, W_Hotbar_Slot_1, W_Hotbar_Slot_2, W_Hotbar_Slot_3, W_Hotbar_Slot_4, W_Hotbar_Slot_5, W_Hotbar_Slot_6, W_Hotbar_Slot_7){
+    localSaveData.hotbarContent[find(x.index)] = x;
+    OnUpdateHotBarSlot(x);
+  }
+}
+
+```
+</details>
+
+<details>
+
+<summary>W_Hotbar_Slot</summary>
+
+# W_Hotbar_Slot
+
+## A Hotbar slot for the hotbar
+
+This is a UI that creates a Hotbar slot for the hotbar, it shows an item in a secific slot in the inventory.
+
+### Widget Configuration
+
+![imagen](https://github.com/user-attachments/assets/94e179d1-8c7a-41e6-9b49-4c22beb34e56) [^98]
+
+[^98]: W_Hotbar_Slot class diagram
+
+![imagen](https://github.com/user-attachments/assets/6e1c062d-bb20-47cd-9a2c-08ed063b61fe) [^99]
+
+[^99]: W_Hotbar_Slot designer in Unreal Engine 5
+
+```
+#import W_Action_Menu
+#import W_Drag_Preview
+#import DD_Inventory_Slot
+
+public class W_Hotbar_Slot{
+
+  public name itemID;
+  public int quantity;
+  public int contentIndex;
+  private W_Action_Menu Action_Menu;
+  public int inventoryIndex;
+  private SizeBox BOX_Quantity;
+  private Border BRD_Border;
+  private Button BTN_SlotButton;
+  private Image IMG_Icon;
+  private TextBlock TXT_Quantity;
+  private EventDispatcher OnHotbarUpdated();
+  ........
+}
+```
+
+<summary>Event Graph</summary>
+
+<ins>PreConstruct</ins>
+
+This Events allows for the Hotbar Slot to be generated, it will generate any pinned item from the inventory
+
+![imagen](https://github.com/user-attachments/assets/21d7fb0c-93bb-49ef-a327-423a0317607f) [^100]
+
+[^100]: PreConstruct in Unreal Engine 5
+
+```
+public event PreConstruct() {
+  InventoryComponent = GetComponentByClass(GetPlayerController(0), "Inventory_System");
+  BindEventToOnInventoryUpdate(InventoryComponent, OnUpdateHotBarSlot());
+  if(InventoryComponent.content.isValidIndex(inventoryIndex)){
+    itemID = InventoryComponent.content[inventroyIndex].itemName;
+    quantity = InventoryComponent.content[inventoryIndex].quantity;
+    switch(GetDataTableRow("Item_Data", itemID)){
+      case "Row Found":
+        SetBrushfromTexture(IMG_Icon, BreakF_Item_Struct(GetDataTableRow("Item_Data", itemID)).thumbnail, false);
+        SetText(TXT_Quantity. quantity.Totext());
+        SetVisibility(BOX_Quantity, IMG_Icon, "Visible");
+      case "Row Not Found":
+        SetVisibility(BOX_Quantity, IMG_Icon, "Hidden");
+    }
+  } else {
+    SetVisibility(BOX_Quantity, IMG_Icon, "Hidden");
+  }
+}
+```
+
+
+<ins>OnUpdateHotBarSlot</ins>
+
+This Events is active when any change is done in a slot of the hotbar slot.
+
+![imagen](https://github.com/user-attachments/assets/41914d1d-2ad1-4c73-a32d-404cfe647334) [^101]
+
+[^101]: OnHotbarUpdated in Unreal Engine 5
+
+```
+public event OnHotBarSlotUpdated() {
+   if(InventoryComponent.content.isValidIndex(inventoryIndex)){
+    itemID = InventoryComponent.content[inventroyIndex].itemName;
+    quantity = InventoryComponent.content[inventoryIndex].quantity;
+    switch(GetDataTableRow("Item_Data", itemID)){
+      case "Row Found":
+        SetBrushfromTexture(IMG_Icon, BreakF_Item_Struct(GetDataTableRow("Item_Data", itemID)).thumbnail, false);
+        SetText(TXT_Quantity. quantity.Totext());
+        SetVisibility(BOX_Quantity, IMG_Icon, "Visible");
+      case "Row Not Found":
+        SetVisibility(BOX_Quantity, IMG_Icon, "Hidden");
+    }
+  } else {
+    SetVisibility(BOX_Quantity, IMG_Icon, "Hidden");
+  }
+}
+```
+
+<summary>OnPreviewMouseButtonDown</summary>
+
+This function show the Drag and Drop preview when the mouse button is being hold
+
+![imagen](https://github.com/user-attachments/assets/b71cb879-2e4c-4f80-95fd-f3bc5ae6c917) [^102]
+
+[^102]: OnPreviewMouseButtonDown function in Unreal Engine 5
+
+```
+
+public OnPreviewMouseButtonDown(PointerEvent MouseEvent){
+  if(itemID == ""){
+    if(IsMouseButtonDown(MouseEvent, "Left Mouse Button")){
+      return DetectDragIfPressed(MouseEvent, "Left Mouse Button");
+    } else {
+      if(IsMouseButtonDown(MouseEvent, "Right Mouse Button")){
+        if(Action_Menu.isValid()){
+          RemoveFromParent(Action_Menu);
+          Action_Menu = CreateWidget("W_Action_Menu", InventoryContent, contentIndex);
+          AddtoViewport(Action_Menu);
+        } else {
+          Action_Menu = CreateWidget("W_Action_Menu", InventoryContent, contentIndex);
+          AddtoViewport(Action_Menu);
+        }
+      }
+    }
+  } else {
+    return ReplyStructure value = Unhandled()
+  }
+}
+
+```
+
+<summary>OnDragDetected</summary>
+
+This function creates the Drag and Drop functionality;
+
+![imagen](https://github.com/user-attachments/assets/423632a5-0739-457c-97cd-afbc713cf749) [^103]
+
+[^103]: OnDragDetected function in Unreal Engine 5
+
+```
+
+public OnDragDetected(){
+  return Create(/*Class*/ "DD_Inventory_Slot",
+              /*Default Drag Visual*/ CreateWidget("W_Drag_Preview",null, itemID),
+              /*Pivot*/ "Center Center",
+              /*Inventory*/ InventoryComponent,
+              /*Content Index*/ invenotryIndex);
+}
+
+```
+
+<summary>OnDrop</summary>
+
+This function detects when an item is dragged and dropped into the slot;
+
+![imagen](https://github.com/user-attachments/assets/074708d2-9cd6-40f7-8506-746a3ba8a6a1) [^104]
+
+[^104]: OnDrop function in Unreal Engine 5
+
+```
+
+public OnDrop(DragDrop operation){
+    inventoryIndex = ((DD_Inventory_Slot) operation).contentIndex;
+    OnUpdateHotBarSlot();
+    CallOnHotbarUpdated(self, /*slot*/ self);
+    return true;
+}
+
+```
 </details>
