@@ -99,6 +99,7 @@ Example:
   #import SaveData-Level
   #import Loot_Bag
   #import Item_Data
+  #import F_Container_Struct
 
   public class Inventory System {
     private int inventorySize = 16 
@@ -1903,4 +1904,238 @@ public OnDrop(DragDrop operation){
 }
 
 ```
+</details>
+
+<details>
+
+<summary>W_Inventory_Button</summary>
+
+# W_Inventory_Button
+
+## Let's filter our items
+
+This is a UI that creates a Button that has a specific item, this button will filter out that type that item.
+
+### Widget Configuration
+
+<img width="517" height="487" alt="imagen" src="https://github.com/user-attachments/assets/bb70c399-3a93-4dbd-981f-154ea8687a64" /> [^105]
+
+[^105]: W_Inventory_Button class diagram
+
+<img width="1409" height="855" alt="imagen" src="https://github.com/user-attachments/assets/f0b19dae-4938-4d68-a777-0343c7bfd40c" /> [^106]
+
+[^106]: W_Inventory_Button designer in Unreal Engine 5
+
+```
+
+public class W_Inventory_Button{
+  private Button BTN_Button;
+  private TextBlock TXT_buttonText;
+  public Text buttonText;
+  private boolean isOn;
+  public int filterFlag;
+  private EventDispatcher OnButtonCLicked();
+  ........
+}
+```
+
+<summary>Event Graph</summary>
+
+<ins>PreConstruct</ins>
+
+This Events allows for the button to be generated, it will generate the text and put it on the button
+<img width="736" height="408" alt="imagen" src="https://github.com/user-attachments/assets/d6594fa7-218a-43d5-9926-e928bb4e515e" /> [^107]
+
+[^107]: PreConstruct in Unreal Engine 5
+
+```
+public event PreConstruct() {
+  set(buttonText, TXT_buttonText);
+}
+```
+
+
+<ins>OnClickedBTN_Button</ins>
+
+This Events is active whenthe button is pressed, it will activate the filter, and change its color
+
+<img width="1120" height="337" alt="imagen" src="https://github.com/user-attachments/assets/9183910e-050f-4559-b1be-844d3a855e2b" /> [^108]
+
+[^108]: OnClickedBTN_Button in Unreal Engine 5
+
+```
+public event OnClickBTN_Button() {
+  isON = !isOn;
+  SetBackgroundColor(BTN_Button, selectColor("white", "gray", isOn));
+  SetColorandOpacitiy(TXT_buttonText, MakeSlateColor(selectColor("gray", "white", isOn), "Specified Color"));
+  CallOnButtonClicked(self, isOn, filterFlag);
+}
+```
+
+</details>
+
+<details>
+
+<summary>W_Inventory_Grid</summary>
+
+# W_Inventory_Grid
+
+## Where we can see out items
+
+This is a UI that creates the grid with all of our items slots.
+
+### Widget Configuration
+
+<img width="519" height="569" alt="imagen" src="https://github.com/user-attachments/assets/65e396f6-1576-4627-94b4-876dee688b05" /> [^109]
+
+[^109]: W_Inventory_Grid class diagram
+
+<img width="1407" height="846" alt="imagen" src="https://github.com/user-attachments/assets/3a4c0f5f-c3d9-44e6-bdcc-e6e38a0c9fc3" /> [^110]
+
+[^110]: W_Inventory_Grid designer in Unreal Engine 5
+
+```
+#import Inventory_System
+
+public class W_Inventory_Grid{
+  private int currentFilter;
+  private boolean isFilterActive;
+  private WrapBox BOX_Grid;
+  private W_Inventory_Button W_Inventroy_Button_36;
+  private W_Inventory_Button W_Inventroy_Button_1;
+  private W_Inventory_Button W_Inventroy_Button_2;
+  private W_Inventory_Button W_Inventroy_Button_3;
+  private W_Inventory_Button W_Inventroy_Button_4;
+  public InventorySystem InventorySystem;
+
+  ........
+}
+```
+
+<summary>Event Graph</summary>
+
+<ins>PreConstruct</ins>
+
+This Events allows for the grid to be generated, it will check for any filter4s being active
+<img width="736" height="408" alt="imagen" src="https://github.com/user-attachments/assets/d6594fa7-218a-43d5-9926-e928bb4e515e" /> [^111]
+
+[^111]: PreConstruct in Unreal Engine 5
+
+```
+public event PreConstruct() {
+  if (InventorySystem.isValid()){
+    forEach x in InvenotrySystem.content {
+      if(FilterItem(content[x]) OR content[x].itemName == ""){
+        AddChild(BOX_Grid, createWidget("W_Inventory_Slot", content[x].itemName, content[x].quantity, InventorySystem, x.index));
+      }
+    }
+    BindEvent(InventorySystem, CreateEvent("Update_Inventory()"));
+  }
+}
+```
+
+
+<ins>DisplayInventory</ins>
+
+This Events is active when the player opens the inventory, it is extremely similar to Preconstruct, it sets the current inventroy System, and clears any unwanted children.
+
+<img width="1548" height="518" alt="imagen" src="https://github.com/user-attachments/assets/324064e4-84ca-4ec8-8f27-f96cd161575d" /> [^112]
+
+[^112]: DisplayInventory_Button in Unreal Engine 5
+
+```
+public event DisplayInventory(InventorySystem InventorySystem) {
+  InventorySystem = this.InventorySystem;
+  ClearChildren(BOX_Grid);
+  if (InventorySystem.isValid()){
+    forEach x in InvenotrySystem.content {
+      if(FilterItem(content[x]) OR content[x].itemName == ""){
+        AddChild(BOX_Grid, createWidget("W_Inventory_Slot", content[x].itemName, content[x].quantity, InventorySystem, x.index));
+      }
+    }
+    BindEvent(InventorySystem, CreateEvent("Update_Inventory()"));
+  }
+}
+```
+
+<ins>UpdateInventory</ins>
+
+This Events activates and updates the inventory, it is extremely similar to Preconstruct, it clears any unwanted children and sets the new inventory.
+
+<img width="1535" height="543" alt="imagen" src="https://github.com/user-attachments/assets/d97a7d29-4183-4e4f-adc6-a5076e230f59" /> [^113]
+
+[^113]: UpdateInventory in Unreal Engine 5
+
+```
+public event UpdateInventory() {
+  ClearChildren(BOX_Grid);
+  if (InventorySystem.isValid()){
+    forEach x in InvenotrySystem.content {
+      if(FilterItem(content[x]) OR content[x].itemName == ""){
+        AddChild(BOX_Grid, createWidget("W_Inventory_Slot", content[x].itemName, content[x].quantity, InventorySystem, x.index));
+      }
+    }
+    BindEvent(InventorySystem, CreateEvent("Update_Inventory()"));
+  }
+}
+```
+
+
+<ins>Construct</ins>
+
+This Events is active when a Filter is changed, this will show change the grid to only show the items specified by the filter.
+
+<img width="1357" height="434" alt="imagen" src="https://github.com/user-attachments/assets/05842e2c-2163-4e25-88ab-5d9fca1ddecb" /> [^114]
+
+[^114]: Construct in Unreal Engine 5
+
+```
+public event Construct() {
+  forEach x in MakeArray(W_Inventory_Button_1, W_Inventory_Button_2, W_Inventory_Button_3, W_Inventory_Button_4, W_Inventory_Button_36){
+    BindEventToOnButtonClicked(x, "OnFilterChange()");
+  }
+}
+```
+
+<ins>OnFilterChange</ins>
+
+This Events is generates the inventory grid and binds the buttons to the filter change event.
+
+<img width="1073" height="224" alt="imagen" src="https://github.com/user-attachments/assets/8316027f-3e35-4b93-a2ee-7c03cced5b7f" /> [^115]
+
+[^115]: OnFilterChange in Unreal Engine 5
+
+```
+public event OnFilterChange(boolean isON, int filter) {
+  currentFilter = selectInt((filter | currentFilter), (filter ^ currentFIlter), isOn);
+  if((float) currentFilter == 0.0){
+    isFilterActive = false;
+    UpdateInventory();
+  } else {
+    isFilterActive = true;
+    UpdateInventroy();
+  }
+}
+```
+<summary>FilterItem</summary>
+
+This function allows for the grid to add a filter, the filter i based on the category of the item, this is changed into a bitmask, and returns the filter.
+
+<img width="1277" height="527" alt="imagen" src="https://github.com/user-attachments/assets/17b1a4a0-6a61-4da0-8396-1a2b6c144269" /> [^116]
+
+[^116]: FilterItem Function in Unreal Engine 5
+
+```
+public FilterItem(F_Slot_Struct slotName) {
+  switch(OutRow as GetDataTableRow("Item_Data", slotName.itemName)){
+    case "Row Found":
+      if(isFilterActive){
+        return (currentFilter & MakeBitMask(Truncate(Power(2.0, (Float) (Int) OutRow.Category)))) ==  MakeBitMask(Truncate(Power(2.0, (Float) (Int) OutRow.Category)));
+      } else {
+        return false;
+      }
+  }
+}
+```
+
 </details>
