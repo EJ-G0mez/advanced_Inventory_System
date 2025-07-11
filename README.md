@@ -2139,3 +2139,282 @@ public FilterItem(F_Slot_Struct slotName) {
 ```
 
 </details>
+
+<details>
+
+<summary>W_Inventory_Slot</summary>
+
+# W_Inventoryr_Slot
+
+## Our Items in their own slot
+
+This is a UI that creates an Inventory slot for the Inventory Grid, it shows an item type that the player has picked up.
+
+### Widget Configuration
+
+<img width="618" height="425" alt="imagen" src="https://github.com/user-attachments/assets/5bef1569-3464-43aa-b030-af520bdcbe84" /> [^117]
+
+[^117]: W_Inventory_Slot class diagram
+
+<img width="1424" height="864" alt="imagen" src="https://github.com/user-attachments/assets/1fab501d-7421-47e7-b9e3-53ec75abeff3" /> [^118]
+
+[^118]: W_Inventory_Slot designer in Unreal Engine 5
+
+```
+#import W_Action_Menu
+#import W_Drag_Preview
+#import DD_Inventory_Slot
+
+public class W_Inventory_Slot{
+
+  public name itemID;
+  public int quantity;
+  public int contentIndex;
+  private W_Action_Menu Action_Menu;
+  public int inventoryIndex;
+  private SizeBox BOX_Quantity;
+  private Border BRD_Border;
+  private Button BTN_SlotButton;
+  private Image IMG_Icon;
+  private TextBlock TXT_Quantity;
+  ........
+}
+```
+
+<summary>Event Graph</summary>
+
+<ins>PreConstruct</ins>
+
+This Events allows for the Inventory Slot to be generated, it will generate any picked uped item.
+
+<img width="1403" height="616" alt="imagen" src="https://github.com/user-attachments/assets/2bcc2c57-f595-4cc4-a952-921af22161b3" /> [^119]
+
+[^119]: PreConstruct in Unreal Engine 5
+
+```
+public event PreConstruct() {
+    switch(GetDataTableRow("Item_Data", itemID)){
+      case "Row Found":
+        SetBrushfromTexture(IMG_Icon, BreakF_Item_Struct(GetDataTableRow("Item_Data", itemID)).thumbnail, false);
+        SetText(TXT_Quantity. quantity.Totext());
+        SetVisibility(BOX_Quantity, IMG_Icon, "Visible");
+      case "Row Not Found":
+        SetVisibility(BOX_Quantity, IMG_Icon, "Hidden");
+    }
+}
+```
+
+<summary>OnPreviewMouseButtonDown</summary>
+
+This function show the Drag and Drop preview when the mouse button is being hold
+
+<img width="1464" height="383" alt="imagen" src="https://github.com/user-attachments/assets/b2dbf0c3-f265-4bc0-afc9-72741b2364f1" /> [^120]
+
+[^120]: OnPreviewMouseButtonDown function in Unreal Engine 5
+
+```
+
+public OnPreviewMouseButtonDown(PointerEvent MouseEvent){
+  if(itemID == ""){
+    if(IsMouseButtonDown(MouseEvent, "Left Mouse Button")){
+      return DetectDragIfPressed(MouseEvent, "Left Mouse Button");
+    } else {
+      if(IsMouseButtonDown(MouseEvent, "Right Mouse Button")){
+        if(Action_Menu.isValid()){
+          RemoveFromParent(Action_Menu);
+          Action_Menu = CreateWidget("W_Action_Menu", InventoryContent, contentIndex);
+          AddtoViewport(Action_Menu);
+        } else {
+          Action_Menu = CreateWidget("W_Action_Menu", InventoryContent, contentIndex);
+          AddtoViewport(Action_Menu);
+        }
+      }
+    }
+  } else {
+    return ReplyStructure value = Unhandled()
+  }
+}
+
+```
+
+<summary>OnDragDetected</summary>
+
+This function creates the Drag and Drop functionality;
+
+<img width="1284" height="425" alt="imagen" src="https://github.com/user-attachments/assets/bfa4e922-aa80-4c83-9c88-e27c251d82a6" /> [^121]
+
+[^121]: OnDragDetected function in Unreal Engine 5
+
+```
+
+public OnDragDetected(){
+  return Create(/*Class*/ "DD_Inventory_Slot",
+              /*Default Drag Visual*/ CreateWidget("W_Drag_Preview",null, itemID),
+              /*Pivot*/ "Center Center",
+              /*Inventory*/ InventoryComponent,
+              /*Content Index*/ invenotryIndex);
+}
+
+```
+
+<summary>OnDrop</summary>
+
+This function detects when an item is dragged and dropped into the slot;
+
+<img width="1475" height="483" alt="imagen" src="https://github.com/user-attachments/assets/a9581d6b-8556-44dd-abeb-feee3d8d92a7" /> [^122]
+
+[^122]: OnDrop function in Unreal Engine 5
+
+```
+
+public OnDrop(DragDrop operation){
+  if(((DD_Inventory_Slot) operation).contentIndex != contentIndex OR ((DD_Inventory_Slot) operation).inventory != inventoryComponent){
+    Server_Transfer_Slots(InventoryComponent, ((DD_Inventory_Slot) operation).contentIndex, ((DD_Inventory_Slot) operation).inventory, contentIndex);
+    return true;
+  }
+}
+
+```
+</details>
+
+<details>
+
+<summary>W_Player_Menu</summary>
+
+# W_Player_Menu
+
+## What the player sees
+
+This is a UI that creates the Player's Menu
+
+### Widget Configuration
+
+ [^117]
+
+[^117]: W_Player_Menu class diagram
+
+<img width="1424" height="864" alt="imagen" src="https://github.com/user-attachments/assets/1fab501d-7421-47e7-b9e3-53ec75abeff3" /> [^118]
+
+[^118]: W_Player_Menu designer in Unreal Engine 5
+
+```
+#import W_Action_Menu
+#import W_Drag_Preview
+#import DD_Inventory_Slot
+
+public class W_Inventory_Slot{
+
+  public name itemID;
+  public int quantity;
+  public int contentIndex;
+  private W_Action_Menu Action_Menu;
+  public int inventoryIndex;
+  private SizeBox BOX_Quantity;
+  private Border BRD_Border;
+  private Button BTN_SlotButton;
+  private Image IMG_Icon;
+  private TextBlock TXT_Quantity;
+  ........
+}
+```
+
+<summary>Event Graph</summary>
+
+<ins>PreConstruct</ins>
+
+This Events allows for the Inventory Slot to be generated, it will generate any picked uped item.
+
+<img width="1403" height="616" alt="imagen" src="https://github.com/user-attachments/assets/2bcc2c57-f595-4cc4-a952-921af22161b3" /> [^119]
+
+[^119]: PreConstruct in Unreal Engine 5
+
+```
+public event PreConstruct() {
+    switch(GetDataTableRow("Item_Data", itemID)){
+      case "Row Found":
+        SetBrushfromTexture(IMG_Icon, BreakF_Item_Struct(GetDataTableRow("Item_Data", itemID)).thumbnail, false);
+        SetText(TXT_Quantity. quantity.Totext());
+        SetVisibility(BOX_Quantity, IMG_Icon, "Visible");
+      case "Row Not Found":
+        SetVisibility(BOX_Quantity, IMG_Icon, "Hidden");
+    }
+}
+```
+
+<ins>PreConstruct</ins>
+
+This Events allows for the Inventory Slot to be generated, it will generate any picked uped item.
+
+<img width="1403" height="616" alt="imagen" src="https://github.com/user-attachments/assets/2bcc2c57-f595-4cc4-a952-921af22161b3" /> [^119]
+
+[^119]: PreConstruct in Unreal Engine 5
+
+```
+public event PreConstruct() {
+    switch(GetDataTableRow("Item_Data", itemID)){
+      case "Row Found":
+        SetBrushfromTexture(IMG_Icon, BreakF_Item_Struct(GetDataTableRow("Item_Data", itemID)).thumbnail, false);
+        SetText(TXT_Quantity. quantity.Totext());
+        SetVisibility(BOX_Quantity, IMG_Icon, "Visible");
+      case "Row Not Found":
+        SetVisibility(BOX_Quantity, IMG_Icon, "Hidden");
+    }
+}
+```
+
+<ins>PreConstruct</ins>
+
+This Events allows for the Inventory Slot to be generated, it will generate any picked uped item.
+
+<img width="1403" height="616" alt="imagen" src="https://github.com/user-attachments/assets/2bcc2c57-f595-4cc4-a952-921af22161b3" /> [^119]
+
+[^119]: PreConstruct in Unreal Engine 5
+
+```
+public event PreConstruct() {
+    switch(GetDataTableRow("Item_Data", itemID)){
+      case "Row Found":
+        SetBrushfromTexture(IMG_Icon, BreakF_Item_Struct(GetDataTableRow("Item_Data", itemID)).thumbnail, false);
+        SetText(TXT_Quantity. quantity.Totext());
+        SetVisibility(BOX_Quantity, IMG_Icon, "Visible");
+      case "Row Not Found":
+        SetVisibility(BOX_Quantity, IMG_Icon, "Hidden");
+    }
+}
+```
+
+
+<summary>OnPreviewMouseButtonDown</summary>
+
+This function show the Drag and Drop preview when the mouse button is being hold
+
+<img width="1464" height="383" alt="imagen" src="https://github.com/user-attachments/assets/b2dbf0c3-f265-4bc0-afc9-72741b2364f1" /> [^120]
+
+[^120]: OnPreviewMouseButtonDown function in Unreal Engine 5
+
+```
+
+public OnPreviewMouseButtonDown(PointerEvent MouseEvent){
+  if(itemID == ""){
+    if(IsMouseButtonDown(MouseEvent, "Left Mouse Button")){
+      return DetectDragIfPressed(MouseEvent, "Left Mouse Button");
+    } else {
+      if(IsMouseButtonDown(MouseEvent, "Right Mouse Button")){
+        if(Action_Menu.isValid()){
+          RemoveFromParent(Action_Menu);
+          Action_Menu = CreateWidget("W_Action_Menu", InventoryContent, contentIndex);
+          AddtoViewport(Action_Menu);
+        } else {
+          Action_Menu = CreateWidget("W_Action_Menu", InventoryContent, contentIndex);
+          AddtoViewport(Action_Menu);
+        }
+      }
+    }
+  } else {
+    return ReplyStructure value = Unhandled()
+  }
+}
+
+```
+</details>
+
