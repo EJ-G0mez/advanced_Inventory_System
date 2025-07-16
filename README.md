@@ -2289,131 +2289,212 @@ This is a UI that creates the Player's Menu
 
 ### Widget Configuration
 
- [^117]
+<img width="1419" height="867" alt="imagen" src="https://github.com/user-attachments/assets/003bbaab-6c3c-4d04-bc64-afbd78147e4c" /> [^123]
 
-[^117]: W_Player_Menu class diagram
+[^123]: W_Player_Menu class diagram
 
-<img width="1424" height="864" alt="imagen" src="https://github.com/user-attachments/assets/1fab501d-7421-47e7-b9e3-53ec75abeff3" /> [^118]
+<img width="309" height="224" alt="imagen" src="https://github.com/user-attachments/assets/06ae444b-dcd6-459f-adbf-c8c9b0e8b63f" /> [^124]
 
-[^118]: W_Player_Menu designer in Unreal Engine 5
+[^124]: W_Player_Menu designer in Unreal Engine 5
 
 ```
-#import W_Action_Menu
-#import W_Drag_Preview
-#import DD_Inventory_Slot
+#import W_Inventory_Grid
 
-public class W_Inventory_Slot{
+public class W_Player_Menu{
 
-  public name itemID;
-  public int quantity;
-  public int contentIndex;
-  private W_Action_Menu Action_Menu;
-  public int inventoryIndex;
-  private SizeBox BOX_Quantity;
-  private Border BRD_Border;
-  private Button BTN_SlotButton;
-  private Image IMG_Icon;
-  private TextBlock TXT_Quantity;
+  private W_Inventory_Grid W_Inventory_Grid
   ........
 }
+
 ```
 
 <summary>Event Graph</summary>
 
 <ins>PreConstruct</ins>
 
-This Events allows for the Inventory Slot to be generated, it will generate any picked uped item.
+This Events allows for the Player Menu to be generated and display the inventory
 
-<img width="1403" height="616" alt="imagen" src="https://github.com/user-attachments/assets/2bcc2c57-f595-4cc4-a952-921af22161b3" /> [^119]
+<img width="1310" height="491" alt="imagen" src="https://github.com/user-attachments/assets/df23f7e4-5e5c-4615-a77e-bcd2ccc3f8f7" /> [^125]
 
-[^119]: PreConstruct in Unreal Engine 5
-
-```
-public event PreConstruct() {
-    switch(GetDataTableRow("Item_Data", itemID)){
-      case "Row Found":
-        SetBrushfromTexture(IMG_Icon, BreakF_Item_Struct(GetDataTableRow("Item_Data", itemID)).thumbnail, false);
-        SetText(TXT_Quantity. quantity.Totext());
-        SetVisibility(BOX_Quantity, IMG_Icon, "Visible");
-      case "Row Not Found":
-        SetVisibility(BOX_Quantity, IMG_Icon, "Hidden");
-    }
-}
-```
-
-<ins>PreConstruct</ins>
-
-This Events allows for the Inventory Slot to be generated, it will generate any picked uped item.
-
-<img width="1403" height="616" alt="imagen" src="https://github.com/user-attachments/assets/2bcc2c57-f595-4cc4-a952-921af22161b3" /> [^119]
-
-[^119]: PreConstruct in Unreal Engine 5
+[^125]: PreConstruct in Unreal Engine 5
 
 ```
 public event PreConstruct() {
-    switch(GetDataTableRow("Item_Data", itemID)){
-      case "Row Found":
-        SetBrushfromTexture(IMG_Icon, BreakF_Item_Struct(GetDataTableRow("Item_Data", itemID)).thumbnail, false);
-        SetText(TXT_Quantity. quantity.Totext());
-        SetVisibility(BOX_Quantity, IMG_Icon, "Visible");
-      case "Row Not Found":
-        SetVisibility(BOX_Quantity, IMG_Icon, "Hidden");
-    }
+  DisplayInevntory(W_Inventory_Grid, GetComponentByClass(GetPlayerCharacter(0)), "Inventory System"));
 }
 ```
 
-<ins>PreConstruct</ins>
+<ins>Construct</ins>
 
-This Events allows for the Inventory Slot to be generated, it will generate any picked uped item.
+This Events allows for the Player Menu to be mouse use only
 
-<img width="1403" height="616" alt="imagen" src="https://github.com/user-attachments/assets/2bcc2c57-f595-4cc4-a952-921af22161b3" /> [^119]
+<img width="1539" height="450" alt="imagen" src="https://github.com/user-attachments/assets/3bbc8745-ff6c-4015-86a4-25f266682fd0" /> [^126]
 
-[^119]: PreConstruct in Unreal Engine 5
+[^126]: Construct in Unreal Engine 5
 
 ```
-public event PreConstruct() {
-    switch(GetDataTableRow("Item_Data", itemID)){
-      case "Row Found":
-        SetBrushfromTexture(IMG_Icon, BreakF_Item_Struct(GetDataTableRow("Item_Data", itemID)).thumbnail, false);
-        SetText(TXT_Quantity. quantity.Totext());
-        SetVisibility(BOX_Quantity, IMG_Icon, "Visible");
-      case "Row Not Found":
-        SetVisibility(BOX_Quantity, IMG_Icon, "Hidden");
-    }
+public event Construct() {
+  SetInputModeUIOnly(GetPlayerController(), W_Inventory_Grid, "Do not look", false);
+  SetShowMouseCursor(true, GetPlayerController(0));
 }
 ```
 
+<ins>Destruct</ins>
 
-<summary>OnPreviewMouseButtonDown</summary>
+This Events allows for the Player Menu to be destroyed and hides the mouse
 
-This function show the Drag and Drop preview when the mouse button is being hold
+<img width="1495" height="396" alt="imagen" src="https://github.com/user-attachments/assets/b2c25778-6527-46d4-a04d-8924fb2bff92" /> [^127]
 
-<img width="1464" height="383" alt="imagen" src="https://github.com/user-attachments/assets/b2dbf0c3-f265-4bc0-afc9-72741b2364f1" /> [^120]
-
-[^120]: OnPreviewMouseButtonDown function in Unreal Engine 5
+[^127]: Destruct in Unreal Engine 5
 
 ```
-
-public OnPreviewMouseButtonDown(PointerEvent MouseEvent){
-  if(itemID == ""){
-    if(IsMouseButtonDown(MouseEvent, "Left Mouse Button")){
-      return DetectDragIfPressed(MouseEvent, "Left Mouse Button");
-    } else {
-      if(IsMouseButtonDown(MouseEvent, "Right Mouse Button")){
-        if(Action_Menu.isValid()){
-          RemoveFromParent(Action_Menu);
-          Action_Menu = CreateWidget("W_Action_Menu", InventoryContent, contentIndex);
-          AddtoViewport(Action_Menu);
-        } else {
-          Action_Menu = CreateWidget("W_Action_Menu", InventoryContent, contentIndex);
-          AddtoViewport(Action_Menu);
-        }
-      }
-    }
-  } else {
-    return ReplyStructure value = Unhandled()
+public event Destruct() {
+  if(GetPLayerController(0).isValid){
+    SetInputModeGameOnly(GetPlayerController(0), false);
+    SetShowMouseCursor(false, GetPlayerController(0));
   }
 }
+```
+
+
+<summary>OnKeyDown</summary>
+
+This function allows the player to press the I key to open the inventory.
+
+<img width="1464" height="383" alt="imagen" src="https://github.com/user-attachments/assets/b2dbf0c3-f265-4bc0-afc9-72741b2364f1" /> [^128]
+
+[^128]: OnKeyDown function in Unreal Engine 5
+
+```
+
+public OnKeyDown(KeyEvent InKeyEvent){
+  if(getKey(InKeyEvent) == "I" OR getKey(InKeyEvent) == "Gamepad Special Right"){
+    RemoveFromParent();
+    return Unhandled();
+  }
+}
+
+```
+</details>
+
+<details>
+
+<summary>F_Container_Struct</summary>
+
+# F_Container_Struct
+
+## How we handle Containers
+
+This is a structure that allows the Inventory System to manage the position and slots of every container.
+
+### Structure Elements
+
+<img width="377" height="219" alt="imagen" src="https://github.com/user-attachments/assets/9d6e1016-5fcc-4926-97d0-054fd7443e32" /> [^129]
+
+[^129]: F_Container_Struct Class Diagram
+
+<img width="1920" height="454" alt="imagen" src="https://github.com/user-attachments/assets/f7a9c9d1-b0d5-43ef-97ab-3bbbcdaa7536" /> [^130]
+
+[^130]: F_Container_Struct in Unreal Engine 5
+
+
+
+```
+#import F_Slot_Struct
+
+struct F_Container_Struct{
+  F_Slot_Struct[] contents,
+  Transform transform;
+}
+
+```
+  
+</details>
+
+<details>
+
+<summary>My_Game_Instance</summary>
+
+# My_Game_Instance
+
+## Let's save our game
+
+This is a blueprint class that allows the game instance to be saved, this will allow the player to save their inventory, conatiner inventories to be saved and loaded from instance.
+
+### Structure Elements
+
+<img width="455" height="205" alt="imagen" src="https://github.com/user-attachments/assets/daa4fd2d-01cc-4380-a6d6-7e4e7efa795a" /> [^131]
+
+[^131]: My__Game_Instance Class Diagram
+
+
+```
+#import SaveData-PlayerData
+
+public class My_Game_Instance{
+
+  private SaveData-PlayerData asSaveData-PlayerData;
+
+  .........
+}
+
+```
+
+<summary>Event Graph</summary>
+
+<ins>Init</ins>
+
+This Event is at the beginning of the project, it checks for a save file, and creates or loads the intended save file for the player.
+
+<img width="1704" height="377" alt="imagen" src="https://github.com/user-attachments/assets/e91fdd97-2adf-4138-be1b-fd013e9cce82" /> [^132]
+
+[^132]: Init in Unreal Engine 5
+
+```
+
+public Init(){
+  if(DoesSaveGameExist("MyData", 0)){
+    try{
+      asSaveData-PlayerData = (SaveData-PlayerData) LoadGamefromSlot("MyData", 0);
+    }
+  } else {
+    asSaveData-PlayerData = CreateSaveGameObject("SaveData.PlayerData");
+  }
+}
+
+```
+</details>
+
+
+<details>
+
+<summary>SaveData-Level</summary>
+
+# My_Game_Instance
+
+## Let's save our game
+
+This is a blueprint class that allows the game instance to be saved, this will allow the player to save their inventory, conatiner inventories to be saved and loaded from instance.
+
+### Structure Elements
+
+<img width="455" height="205" alt="imagen" src="https://github.com/user-attachments/assets/daa4fd2d-01cc-4380-a6d6-7e4e7efa795a" /> [^131]
+
+[^131]: My__Game_Instance Class Diagram
+
+
+```
+#import SaveData-PlayerData
+
+public class My_Game_Instance{
+
+  private SaveData-PlayerData asSaveData-PlayerData;
+
+  .........
+}
+
+```
+
 
 ```
 </details>
