@@ -2470,32 +2470,63 @@ public Init(){
 
 <summary>SaveData-Level</summary>
 
-# My_Game_Instance
+# SaveData-Level
 
-## Let's save our game
+## Let's save the level
 
-This is a blueprint class that allows the game instance to be saved, this will allow the player to save their inventory, conatiner inventories to be saved and loaded from instance.
+This is a blueprint class that allows the level instance to be saved, this will allow the game to record the position of items and how many items are in the level
 
 ### Structure Elements
 
-<img width="455" height="205" alt="imagen" src="https://github.com/user-attachments/assets/daa4fd2d-01cc-4380-a6d6-7e4e7efa795a" /> [^131]
+<img width="445" height="212" alt="imagen" src="https://github.com/user-attachments/assets/12ca0a64-c74d-48af-979f-56723e524a2b" /> [^133]
 
-[^131]: My__Game_Instance Class Diagram
+[^133]: SaveData-Level Class Diagram
 
 
 ```
-#import SaveData-PlayerData
+#import InventorySystem
+#import F_Container_Struct
 
-public class My_Game_Instance{
+public class SaveData-Level{
 
-  private SaveData-PlayerData asSaveData-PlayerData;
+  private soft Actor[] actorsRemoved
+  private softRef Actor{transform}  actorsAdded;
+  private softRef InventorySytem{F_Container_Struct} containerAdded:
 
-  .........
 }
 
 ```
 
-
-```
 </details>
 
+
+<details>
+
+<summary>SaveData-PlayerData</summary>
+
+# SaveData-Level
+
+## Let's save the level
+
+This is a blueprint class that allows the player instance to be saved, this will allow the game to record the player's stored and removed items.
+
+### Structure Elements
+
+<img width="446" height="192" alt="imagen" src="https://github.com/user-attachments/assets/df08b41f-9cbc-427d-ab2a-65a32114e8f8" /> [^134]
+
+[^134]: SaveData-Level Class Diagram
+
+
+```
+#import F_Slot_Struct
+
+public class SaveData-Player{
+
+  private F_Slot_Struct[] inventoryContent;
+  private int[] hotbarContent;
+
+}
+
+```
+
+</details>
