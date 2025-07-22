@@ -2530,3 +2530,89 @@ public class SaveData-Player{
 ```
 
 </details>
+
+<details>
+
+<summary>W_Player_HUD</summary>
+
+# W_Player_HUD
+
+## Let's put all our widgets
+
+This is the Widget that functions as the HUD of the player, it holds the players inventorys, containers, and the hotbar.
+
+### Widget Configuration
+
+<img width="564" height="269" alt="imagen" src="https://github.com/user-attachments/assets/3c888918-74bd-4b78-88af-1658b4ae369e" /> [^135]
+
+[^135]: W_Player_HUD Class Diagram
+
+<img width="1405" height="868" alt="imagen" src="https://github.com/user-attachments/assets/8c40414d-c7a4-43a9-b8db-20f1006bd814" /> [^136]
+
+[^136]: W_Player_HUD Designer in Unreal Engine 5
+
+```
+#import Inventory_System
+
+public class  W_Player_HUD {
+
+  private UserWidget menu;
+
+.......
+
+
+}
+
+```
+
+<summary>Event Graph</summary>
+
+<ins>DisplayPlayerMenu</ins>
+
+This Event creates the player menu widget and adds them to the Viewport
+
+<img width="749" height="191" alt="imagen" src="https://github.com/user-attachments/assets/9ee8851f-827c-417b-94be-2bb299a792ab" /> [^137]
+
+[^137]: DiplayPlayerMenu in Unreal Engine 5
+
+```
+
+public event DisplayPlayerMenu(){
+  menu = createWidget("W_Player_Menu");
+  AddToViewPort(menu, 1);
+}
+```
+
+<ins>ShowContainer</ins>
+
+This Event creates the container inventory widget and adds them to the Viewport
+
+<img width="802" height="234" alt="imagen" src="https://github.com/user-attachments/assets/b4c47727-387c-4bdf-8c51-edf844ac7d22" /> [^138]
+
+[^138]: ShowContainer in Unreal Engine 5
+
+```
+
+public event ShowConatiner(InventorySystem containerInventory){
+  menu = createWidget("W_Container_Inventory", container_Inventory);
+  AddToViewPort(menu, 0);
+}
+```
+
+<ins>DisplayHotbar</ins>
+
+This Event creates the Hotbar widget and adds them to the Viewport
+
+<img width="884" height="214" alt="imagen" src="https://github.com/user-attachments/assets/7c51282b-d5da-4d91-9917-5a290bb79dfa" /> [^139]
+
+[^139]: DisplayHotbar in Unreal Engine 5
+
+```
+
+public event DisplayHotBar(){
+  menu = createWidget("W_Hotbar");
+  AddToViewPort(menu, 2);
+}
+```
+  
+</details>
