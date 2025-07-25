@@ -2616,3 +2616,196 @@ public event DisplayHotBar(){
 ```
   
 </details>
+
+<details>
+
+<summary>MyPlayerController</summary>
+
+# MyPlayerController
+
+## This is what controls the player
+
+This is a Controller blueprint that is made for the sake of allowing the player character to interact with items and open their inventory.
+
+### Structure Elements
+
+<img width="422" height="182" alt="imagen" src="https://github.com/user-attachments/assets/ff0fcbeb-8df2-4c76-8aa6-dd5baf8b3561" /> [^140]
+
+[^140]: MyPlayerController class diagram
+
+```
+#import W_Player_HID
+
+public class MyPlayerController {
+
+    private W_Player_HUD HUD;
+
+........
+}
+
+```
+
+<summary>Event Graph</summary>
+
+<ins>BeginPlay</ins>
+
+This event that triggers when starting to play the project allows the HUD to be placed and created.
+
+<img width="950" height="277" alt="imagen" src="https://github.com/user-attachments/assets/1eaf265a-704d-414c-abcb-74a6e461c157" /> [^141]
+
+[^141]: BeginePlay in Unreal Engine 5
+
+```
+public event BeginPlay(){
+  if(isLocalPlayerController(self)){
+    HUD = CreateWidget("W_Player_HUD");
+    AddToViewport(HUD, 0);
+    DisplayHotbar(HUD);
+  }
+}
+```
+
+<ins>InputActionInventory</ins>
+
+This event that tallows the player to open their inventory when the I button is pressed
+
+<img width="950" height="277" alt="imagen" src="https://github.com/user-attachments/assets/1eaf265a-704d-414c-abcb-74a6e461c157" /> [^142]
+
+[^142]: InputAction Inventory in Unreal Engine 5
+
+```
+public event InputActionInventory(){
+  keyStructure key = "I";
+  switch(key){
+    case Pressed:
+      DisplayPlayerMenu(HUD);
+  }
+}
+```
+  
+</details>
+
+<details>
+
+<summary>BP_ThirdPersonGameModer</summary>
+
+# BP_ThirdPersonGameMode
+
+## The default Unreal Engine 5 3rd Person Game Mode
+
+This is the default third person game mode blueprint in Unreal Engine 5, it has an added Event Graph that was configured additionally for this project.
+
+### Structure Elements
+<img width="583" height="306" alt="imagen" src="https://github.com/user-attachments/assets/1cdf0d23-0226-4064-adb0-0aacb0a7095b" /> [^143]
+
+[^143]: BP_ThirdPersonGameMode class diagram
+
+```
+#import SaveData-Level
+
+public class BP_ThirdPersonGameMode {
+
+    private Scene DefaultRootScene;
+    private string levelDataSlot;
+    private AsSaveData-Level SaveData-Level;
+
+........
+}
+
+```
+
+<summary>Event Graph</summary>
+
+<ins>Begin Play</ins>
+
+This event that triggers when starting to play the project, it saves and loads an saved levels.
+
+<img width="1754" height="350" alt="imagen" src="https://github.com/user-attachments/assets/0ad1cf84-7d05-43fe-b17b-9c8bf784e402" /> [^144]
+
+[^144]: BeginePlay in Unreal Engine 5
+
+```
+public event BeginPlay(){
+  leveDataSlot = append(getCurrentLevelName(), "_Data");
+  if(DoesSaveGameExist(levelDataSlot()){
+    AsSaveData-Level = (SaveData-Level) LoadGameFromSlot(levelDataSlot, 0);
+    SaveGametoSlot(AsSaveData-Level, levelDataSlot, 0);
+    forEach(keys in Keys(AsSaveData-Level.ActorsAdded)){
+      SpawnActor(keys, find(AsSaveData-Level.ActorsAdded, keys), "AlwaysSpanw. Ignore Collisions");
+    }
+    forEach(x in AsSaveData-Level.ActorsRemoved){
+      if(x.isValid){
+        DestroyActor(x);
+      }
+    }
+  } else {
+    AsSaveData-Level = CreateSaveGameObject("SaveData-Level");
+    SSaveGametoSlot(AsSaveData-Level, levelDataSlot, 0);
+  }
+}
+```
+
+<ins>End Play</ins>
+
+This event that triggers when ending to play the project, it saves all levels
+
+<img width="688" height="366" alt="imagen" src="https://github.com/user-attachments/assets/11e4015f-8497-4e9f-9b15-fab08f6f3d67" /> [^145]
+
+[^145]: EndPlay in Unreal Engine 5
+
+```
+public event EndPlay(){
+  SaveGameToSlot(AsSaveData-Level, levelDataSlot, 0);
+}
+```
+
+</details>
+
+<details>
+
+<summary>BP_ThirdPersonCharacterr</summary>
+
+# BP_ThirdPersonCharacter
+
+## The default Unreal Engine 5 3rd Person Character
+
+This is the default third person character blueprint in Unreal Engine 5, it has an added Event Graph that was configured additional events for this project.
+
+### Structure Elements
+<img width="591" height="229" alt="imagen" src="https://github.com/user-attachments/assets/555e98af-5bb4-453f-a202-90368c17ddfa" /> [^146]
+
+[^146]: BP_ThirdPersonCharacter class diagram
+
+```
+#import Inventory_System
+
+public class BP_ThirdPersonCharacter {
+
+    private Inventory_System Inventory_System;
+
+........
+}
+
+```
+
+<summary>Event Graph</summary>
+
+<ins>2</ins>
+
+This event that triggers when pressing 2, to search for apples in the inventory, it is only used for testing purposes and has no additional function.
+
+<img width="1754" height="350" alt="imagen" src="https://github.com/user-attachments/assets/0ad1cf84-7d05-43fe-b17b-9c8bf784e402" /> [^147]
+
+[^147]: 2 in Unreal Engine 5
+
+```
+public event 2(){
+  KeyStructure Key = "2";
+  switch(key){
+    case "Pressed":
+      PrintString(toString(QueryInventory(Inventory_System, "apple", 2)));
+  }
+}
+```
+
+</details>
