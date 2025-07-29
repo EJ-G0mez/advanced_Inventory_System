@@ -13,6 +13,8 @@ The Inventory Systems main goal is to serve as both a _practice and training exe
 
 This document is meant to be a documentation of all the features as well as an explanation using Pseudo code for all the added elements of the project.
 
+To watch a Demo Reel of the project in action, you can see it [HERE](https://youtu.be/o1G9fDFZRwM).
+
 # Content
 
 <details>
