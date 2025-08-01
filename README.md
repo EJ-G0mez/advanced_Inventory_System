@@ -76,7 +76,7 @@ Example:
 
 <details>
 
-  <img width="1173" height="851" alt="imagen" src="https://github.com/user-attachments/assets/e8d68e57-3f5a-4b3d-8613-ac34c16042be" /> [^148]
+  <img width="1174" height="851" alt="imagen" src="https://github.com/user-attachments/assets/10e4bb27-16db-456f-b7ee-36db29d7c5f1" /> [^148]
 
   [^148]: Full class diagram of the project
   
