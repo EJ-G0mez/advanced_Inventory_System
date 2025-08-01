@@ -75,10 +75,6 @@ Example:
 </details>
 
 <details>
-
-  <img width="1174" height="851" alt="imagen" src="https://github.com/user-attachments/assets/10e4bb27-16db-456f-b7ee-36db29d7c5f1" /> [^148]
-
-  [^148]: Full class diagram of the project
   
   <summary>Inventory System</summary>
 
